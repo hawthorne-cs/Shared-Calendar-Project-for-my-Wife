@@ -1,0 +1,28 @@
+# Environment Variables
+.env
+.env.local
+
+# Node Modules
+node_modules/
+
+# Next.js Build Output
+.next/
+
+# Prisma Migrations (optional)
+prisma/migrations/
+
+# Logs
+*.log
+
+# IDE/Editor Configurations
+.vscode/
+.idea/
+
+# Temporary Files
+*.tmp
+
+# MacOS specific files
+.DS_Store
+
+# Windows specific files
+Thumbs.db
