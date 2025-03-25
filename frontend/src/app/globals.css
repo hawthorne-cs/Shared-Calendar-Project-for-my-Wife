@@ -6,11 +6,63 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 210 100% 50%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 161 100% 40%;
+    --secondary-foreground: 161 40% 18%;
+    --accent: 262 80% 60%;
+    --accent-foreground: 210 40% 98%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.5rem;
   }
 
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
+    --card: 222.2 84% 9.8%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 7%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 100% 45%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 161 84% 35%;
+    --secondary-foreground: 161 40% 98%;
+    --accent: 262 75% 55%;
+    --accent-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --destructive: 0 62.8% 50.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-bold;
+  }
+
+  .disable-transitions * {
+    transition: none !important;
   }
 }
 
@@ -18,23 +70,67 @@
   .btn-primary {
     @apply px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 
            transition-colors duration-200 focus:outline-none focus:ring-2 
-           focus:ring-primary-500 focus:ring-offset-2;
+           focus:ring-primary-500 focus:ring-offset-2 shadow-sm;
   }
 
   .btn-secondary {
     @apply px-4 py-2 bg-secondary-600 text-white rounded-lg hover:bg-secondary-700 
            transition-colors duration-200 focus:outline-none focus:ring-2 
-           focus:ring-secondary-500 focus:ring-offset-2;
+           focus:ring-secondary-500 focus:ring-offset-2 shadow-sm;
+  }
+
+  .btn-accent {
+    @apply px-4 py-2 bg-accent-600 text-white rounded-lg hover:bg-accent-700 
+           transition-colors duration-200 focus:outline-none focus:ring-2 
+           focus:ring-accent-500 focus:ring-offset-2 shadow-sm;
+  }
+
+  .btn-ghost {
+    @apply px-4 py-2 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800
+           text-gray-700 dark:text-gray-200 rounded-lg
+           transition-colors duration-200 focus:outline-none focus:ring-2
+           focus:ring-gray-500 focus:ring-offset-2;
   }
 
   .card {
-    @apply bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 
-           transition-all duration-200 hover:shadow-lg;
+    @apply bg-white dark:bg-discord-900 rounded-xl border border-gray-200 dark:border-discord-700
+           shadow-sm hover:shadow transition-all duration-200;
+  }
+
+  .sidebar {
+    @apply bg-discord-100 dark:bg-discord-950 h-full transition-all duration-300 ease-in-out;
+  }
+
+  .menu-item {
+    @apply flex items-center px-4 py-2 text-gray-700 dark:text-gray-200
+           rounded-lg hover:bg-gray-100 dark:hover:bg-discord-800
+           transition-colors duration-200 cursor-pointer;
+  }
+
+  .menu-item-active {
+    @apply bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300
+           hover:bg-primary-200 dark:hover:bg-primary-800;
   }
 
   .input {
-    @apply w-full px-4 py-2 border border-gray-300 dark:border-gray-600 
+    @apply w-full px-4 py-2 bg-white dark:bg-discord-800 
+           border border-gray-300 dark:border-discord-700 
            rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 
-           dark:bg-gray-700 dark:text-white;
+           text-gray-900 dark:text-white placeholder:text-gray-500
+           transition-colors duration-200;
+  }
+
+  .calendar-grid {
+    @apply grid grid-cols-7 gap-1 w-full;
+  }
+
+  .calendar-day {
+    @apply min-h-[100px] p-2 bg-white dark:bg-discord-900 
+           rounded-lg border border-gray-200 dark:border-discord-700;
+  }
+
+  .event-item {
+    @apply p-2 rounded-lg text-sm mb-1 truncate cursor-pointer 
+           hover:opacity-90 transition-opacity;
   }
 } 
