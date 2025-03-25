@@ -91,7 +91,7 @@ export function AppShell({ children }: AppShellProps) {
                 <CalendarIcon className="w-5 h-5 text-white" />
               </div>
               <span className="font-display font-bold text-lg text-gray-900 dark:text-white">
-                Gatherly
+                CJ's Calendars
               </span>
             </Link>
           )}

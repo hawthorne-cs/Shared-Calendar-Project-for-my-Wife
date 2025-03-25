@@ -12,7 +12,7 @@ export default function Home() {
               <CalendarIcon className="w-6 h-6 text-white" />
             </div>
             <span className="font-display font-bold text-2xl text-gray-900 dark:text-white">
-              Gatherly
+              CJ's Calendars
             </span>
           </div>
           <div className="flex space-x-4">
@@ -68,7 +68,7 @@ export default function Home() {
       <section className="py-16 px-4 bg-white dark:bg-discord-900">
         <div className="container mx-auto max-w-6xl">
           <h2 className="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">
-            Why Choose Gatherly?
+            Why Choose CJ's Calendars?
           </h2>
           
           <div className="grid md:grid-cols-3 gap-8">
@@ -133,7 +133,7 @@ export default function Home() {
                   <CalendarIcon className="w-5 h-5 text-white" />
                 </div>
                 <span className="font-display font-bold text-xl text-gray-900 dark:text-white">
-                  Gatherly
+                  CJ's Calendars
                 </span>
               </div>
               <p className="text-gray-600 dark:text-gray-400 max-w-xs">

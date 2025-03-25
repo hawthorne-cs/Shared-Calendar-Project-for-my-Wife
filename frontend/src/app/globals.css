@@ -1,6 +1,9 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Import Tailwind CSS base styles */
+@import 'tailwindcss/base';
+/* Import Tailwind CSS component styles */
+@import 'tailwindcss/components';
+/* Import Tailwind CSS utility styles */
+@import 'tailwindcss/utilities';
 
 @layer base {
   :root {
@@ -49,16 +52,18 @@
   }
 
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
 
   body {
-    @apply bg-background text-foreground;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display font-bold;
+    font-family: var(--font-display);
+    font-weight: bold;
   }
 
   .disable-transitions * {
@@ -68,69 +73,155 @@
 
 @layer components {
   .btn-primary {
-    @apply px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 
-           transition-colors duration-200 focus:outline-none focus:ring-2 
-           focus:ring-primary-500 focus:ring-offset-2 shadow-sm;
+    padding: 0.5rem 1rem;
+    background-color: hsl(var(--primary));
+    color: white;
+    border-radius: 0.5rem;
+    transition-property: background-color;
+    transition-duration: 200ms;
+  }
+  .btn-primary:hover {
+    background-color: hsl(var(--primary) / 0.9);
+  }
+  .btn-primary:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px hsl(var(--primary) / 0.5), 0 0 0 4px white;
   }
 
   .btn-secondary {
-    @apply px-4 py-2 bg-secondary-600 text-white rounded-lg hover:bg-secondary-700 
-           transition-colors duration-200 focus:outline-none focus:ring-2 
-           focus:ring-secondary-500 focus:ring-offset-2 shadow-sm;
+    padding: 0.5rem 1rem;
+    background-color: hsl(var(--secondary));
+    color: white;
+    border-radius: 0.5rem;
+    transition-property: background-color;
+    transition-duration: 200ms;
+  }
+  .btn-secondary:hover {
+    background-color: hsl(var(--secondary) / 0.9);
+  }
+  .btn-secondary:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px hsl(var(--secondary) / 0.5), 0 0 0 4px white;
   }
 
   .btn-accent {
-    @apply px-4 py-2 bg-accent-600 text-white rounded-lg hover:bg-accent-700 
-           transition-colors duration-200 focus:outline-none focus:ring-2 
-           focus:ring-accent-500 focus:ring-offset-2 shadow-sm;
+    padding: 0.5rem 1rem;
+    background-color: hsl(var(--accent));
+    color: white;
+    border-radius: 0.5rem;
+    transition-property: background-color;
+    transition-duration: 200ms;
+  }
+  .btn-accent:hover {
+    background-color: hsl(var(--accent) / 0.9);
+  }
+  .btn-accent:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px hsl(var(--accent) / 0.5), 0 0 0 4px white;
   }
 
   .btn-ghost {
-    @apply px-4 py-2 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800
-           text-gray-700 dark:text-gray-200 rounded-lg
-           transition-colors duration-200 focus:outline-none focus:ring-2
-           focus:ring-gray-500 focus:ring-offset-2;
+    padding: 0.5rem 1rem;
+    background-color: transparent;
+    color: hsl(var(--foreground));
+    border-radius: 0.5rem;
+    transition-property: background-color;
+    transition-duration: 200ms;
+  }
+  .btn-ghost:hover {
+    background-color: hsl(var(--muted));
+  }
+  .btn-ghost:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px hsl(var(--muted) / 0.5), 0 0 0 4px white;
   }
 
   .card {
-    @apply bg-white dark:bg-discord-900 rounded-xl border border-gray-200 dark:border-discord-700
-           shadow-sm hover:shadow transition-all duration-200;
+    background-color: hsl(var(--card));
+    border-radius: 0.75rem;
+    border: 1px solid hsl(var(--border));
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    transition-property: all;
+    transition-duration: 200ms;
+  }
+  .card:hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
   }
 
   .sidebar {
-    @apply bg-discord-100 dark:bg-discord-950 h-full transition-all duration-300 ease-in-out;
+    background-color: hsl(var(--background));
+    height: 100%;
+    transition: all 300ms ease-in-out;
   }
 
   .menu-item {
-    @apply flex items-center px-4 py-2 text-gray-700 dark:text-gray-200
-           rounded-lg hover:bg-gray-100 dark:hover:bg-discord-800
-           transition-colors duration-200 cursor-pointer;
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    color: hsl(var(--foreground));
+    border-radius: 0.5rem;
+    transition-property: background-color;
+    transition-duration: 200ms;
+    cursor: pointer;
+  }
+  .menu-item:hover {
+    background-color: hsl(var(--muted));
   }
 
   .menu-item-active {
-    @apply bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300
-           hover:bg-primary-200 dark:hover:bg-primary-800;
+    background-color: hsl(var(--primary) / 0.1);
+    color: hsl(var(--primary));
+  }
+  .menu-item-active:hover {
+    background-color: hsl(var(--primary) / 0.2);
   }
 
   .input {
-    @apply w-full px-4 py-2 bg-white dark:bg-discord-800 
-           border border-gray-300 dark:border-discord-700 
-           rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 
-           text-gray-900 dark:text-white placeholder:text-gray-500
-           transition-colors duration-200;
+    width: 100%;
+    padding: 0.5rem 1rem;
+    background-color: hsl(var(--background));
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.5rem;
+    color: hsl(var(--foreground));
+    transition-property: background-color;
+    transition-duration: 200ms;
+  }
+  .input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px hsl(var(--ring));
+  }
+  .input::placeholder {
+    color: hsl(var(--muted-foreground));
   }
 
   .calendar-grid {
-    @apply grid grid-cols-7 gap-1 w-full;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.25rem;
+    width: 100%;
   }
 
   .calendar-day {
-    @apply min-h-[100px] p-2 bg-white dark:bg-discord-900 
-           rounded-lg border border-gray-200 dark:border-discord-700;
+    min-height: 100px;
+    padding: 0.5rem;
+    background-color: hsl(var(--card));
+    border-radius: 0.5rem;
+    border: 1px solid hsl(var(--border));
   }
 
   .event-item {
-    @apply p-2 rounded-lg text-sm mb-1 truncate cursor-pointer 
-           hover:opacity-90 transition-opacity;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+    transition-property: opacity;
+    transition-duration: 200ms;
   }
-} 
+  .event-item:hover {
+    opacity: 0.9;
+  }
+}

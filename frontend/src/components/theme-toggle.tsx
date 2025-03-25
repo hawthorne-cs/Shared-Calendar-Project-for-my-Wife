@@ -14,7 +14,7 @@ export function ThemeToggle() {
         <MoonIcon className="w-5 h-5" />
       )}
       <span className="ml-3">
-        {theme === "dark" ? "Light Mode" : "Dark Mode"}
+        {theme === "dark" ? "Light Mode" : "Dark Mode"} - CJ's Calendars
       </span>
       <button
         onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
