@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { AppShell } from '@/components/app-shell'
-import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from '@/components/icons'
+import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon, PlusIcon } from '@/components/icons'
 
 // Mock data for events
 const mockEvents = [
@@ -10,31 +10,31 @@ const mockEvents = [
     id: '1',
     title: 'Team Meeting',
     date: '2023-06-10',
-    color: 'bg-primary-500'
+    color: 'bg-[#5865f2]'
   },
   {
     id: '2',
     title: 'Lunch with Alex',
     date: '2023-06-10',
-    color: 'bg-secondary-500'
+    color: 'bg-[#3ba55c]'
   },
   {
     id: '3',
     title: 'Project Deadline',
     date: '2023-06-12',
-    color: 'bg-accent-500'
+    color: 'bg-[#eb459e]'
   },
   {
     id: '4',
     title: 'Doctor Appointment',
     date: '2023-06-15',
-    color: 'bg-primary-500'
+    color: 'bg-[#faa61a]'
   },
   {
     id: '5',
     title: 'Birthday Party',
     date: '2023-06-20',
-    color: 'bg-secondary-500'
+    color: 'bg-[#ed4245]'
   }
 ]
 
@@ -101,45 +101,45 @@ export default function CalendarPage() {
   return (
     <AppShell>
       <div className="p-6">
-        <header className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+        <header className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center">
-              <CalendarIcon className="w-6 h-6 mr-2 text-primary-500" />
+            <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-2">
+              <span className="h-7 w-1 bg-[#5865f2] rounded-full"></span>
               Calendar
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-[#b9bbbe]">
               Manage your events and schedules
             </p>
           </div>
           
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-            <div className="flex space-x-2">
+            <div className="flex bg-[#202225] p-1 rounded-md">
               <button 
                 onClick={() => setView('month')}
-                className={`px-3 py-1 rounded-md ${
+                className={`px-3 py-1.5 rounded transition-colors ${
                   view === 'month'
-                    ? 'bg-primary-500 text-white'
-                    : 'bg-gray-100 dark:bg-discord-800 text-gray-700 dark:text-gray-300'
+                    ? 'bg-[#36393f] text-white'
+                    : 'text-[#b9bbbe] hover:text-white'
                 }`}
               >
                 Month
               </button>
               <button 
                 onClick={() => setView('week')}
-                className={`px-3 py-1 rounded-md ${
+                className={`px-3 py-1.5 rounded transition-colors ${
                   view === 'week'
-                    ? 'bg-primary-500 text-white'
-                    : 'bg-gray-100 dark:bg-discord-800 text-gray-700 dark:text-gray-300'
+                    ? 'bg-[#36393f] text-white'
+                    : 'text-[#b9bbbe] hover:text-white'
                 }`}
               >
                 Week
               </button>
               <button 
                 onClick={() => setView('day')}
-                className={`px-3 py-1 rounded-md ${
+                className={`px-3 py-1.5 rounded transition-colors ${
                   view === 'day'
-                    ? 'bg-primary-500 text-white'
-                    : 'bg-gray-100 dark:bg-discord-800 text-gray-700 dark:text-gray-300'
+                    ? 'bg-[#36393f] text-white'
+                    : 'text-[#b9bbbe] hover:text-white'
                 }`}
               >
                 Day
@@ -148,88 +148,92 @@ export default function CalendarPage() {
             
             <button 
               onClick={goToToday}
-              className="px-3 py-1 bg-secondary-500 text-white rounded-md"
+              className="px-4 py-1.5 bg-[#3ba55c] text-white rounded-md hover:bg-[#359951] transition-colors"
             >
               Today
             </button>
           </div>
         </header>
         
-        <div className="card p-6">
+        <div className="bg-[#2f3136] rounded-lg border border-[#202225] overflow-hidden">
           {/* Calendar header */}
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+          <div className="flex items-center justify-between p-4 border-b border-[#202225]">
+            <h2 className="text-xl font-semibold text-white">
               {monthName} {year}
             </h2>
             <div className="flex space-x-2">
               <button 
                 onClick={previousMonth}
-                className="p-2 rounded-full bg-gray-100 dark:bg-discord-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-discord-700"
+                className="p-2 rounded-md bg-[#202225] text-[#b9bbbe] hover:bg-[#40444b] hover:text-white transition-colors"
               >
                 <ChevronLeftIcon className="w-5 h-5" />
               </button>
               <button 
                 onClick={nextMonth}
-                className="p-2 rounded-full bg-gray-100 dark:bg-discord-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-discord-700"
+                className="p-2 rounded-md bg-[#202225] text-[#b9bbbe] hover:bg-[#40444b] hover:text-white transition-colors"
               >
                 <ChevronRightIcon className="w-5 h-5" />
               </button>
             </div>
           </div>
           
-          {/* Day headers */}
-          <div className="grid grid-cols-7 gap-1 mb-1">
-            {dayNames.map(day => (
-              <div 
-                key={day} 
-                className="py-2 text-center text-sm font-medium text-gray-600 dark:text-gray-400"
-              >
-                {day}
-              </div>
-            ))}
-          </div>
-          
-          {/* Calendar days */}
-          <div className="grid grid-cols-7 gap-1 border-t border-gray-200 dark:border-discord-800 pt-1">
-            {monthData.map((day, index) => (
-              <div 
-                key={index} 
-                className={`min-h-[100px] relative border rounded-lg p-1 ${
-                  day.day === 0
-                    ? 'bg-gray-50 dark:bg-discord-950 border-gray-200 dark:border-discord-800'
-                    : 'bg-white dark:bg-discord-900 border-gray-200 dark:border-discord-800'
-                }`}
-              >
-                {day.day > 0 && (
-                  <>
-                    <div className="text-right mb-1">
-                      <span 
-                        className={`inline-block w-6 h-6 rounded-full text-center text-sm ${
-                          day.date?.toDateString() === new Date().toDateString()
-                            ? 'bg-primary-500 text-white'
-                            : 'text-gray-600 dark:text-gray-400'
-                        }`}
-                      >
-                        {day.day}
-                      </span>
-                    </div>
-                    <div className="space-y-1 overflow-y-auto max-h-[80px]">
-                      {day.events.map(event => (
-                        <div 
-                          key={event.id}
-                          className={`${event.color} px-2 py-1 rounded-md text-white text-xs truncate`}
+          <div className="p-4">
+            {/* Day headers */}
+            <div className="grid grid-cols-7 gap-2 mb-2">
+              {dayNames.map(day => (
+                <div 
+                  key={day} 
+                  className="py-2 text-center text-sm font-medium text-[#b9bbbe]"
+                >
+                  {day}
+                </div>
+              ))}
+            </div>
+            
+            {/* Calendar days */}
+            <div className="grid grid-cols-7 gap-2">
+              {monthData.map((day, index) => (
+                <div 
+                  key={index} 
+                  className={`min-h-[100px] relative rounded-md p-2 border ${
+                    day.day === 0
+                      ? 'bg-[#202225] border-[#202225]'
+                      : day.date?.toDateString() === new Date().toDateString()
+                        ? 'bg-[#36393f] border-[#5865f2]'
+                        : 'bg-[#36393f] border-[#202225] hover:border-[#3ba55c] transition-colors'
+                  }`}
+                >
+                  {day.day > 0 && (
+                    <>
+                      <div className="flex justify-between items-center mb-2">
+                        <span 
+                          className={`text-sm ${
+                            day.date?.toDateString() === new Date().toDateString()
+                              ? 'text-white font-semibold'
+                              : 'text-[#b9bbbe]'
+                          }`}
                         >
-                          {event.title}
-                        </div>
-                      ))}
-                    </div>
-                    <button className="absolute bottom-1 right-1 w-5 h-5 bg-gray-200 dark:bg-discord-700 rounded-full flex items-center justify-center text-gray-700 dark:text-gray-300 text-xs">
-                      +
-                    </button>
-                  </>
-                )}
-              </div>
-            ))}
+                          {day.day}
+                        </span>
+                        <button className="w-5 h-5 rounded-full bg-[#36393f] border border-[#202225] flex items-center justify-center text-[#b9bbbe] hover:text-white hover:bg-[#40444b] hover:border-[#b9bbbe] transition-colors">
+                          <PlusIcon className="w-3 h-3" />
+                        </button>
+                      </div>
+                      <div className="space-y-1 overflow-y-auto max-h-[80px]">
+                        {day.events.map(event => (
+                          <div 
+                            key={event.id}
+                            className={`${event.color} px-2 py-1 rounded text-white text-xs font-medium truncate shadow-sm`}
+                          >
+                            {event.title}
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
