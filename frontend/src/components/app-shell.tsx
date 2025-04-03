@@ -203,12 +203,12 @@ export function AppShell({ children }: AppShellProps) {
         {/* User profile area */}
         <div className="h-[52px] p-2 bg-[#292b2f] flex items-center">
           <div className="flex items-center flex-1">
-            <div className="relative">
+            <Link href="/profile" className="relative">
               <div className="w-8 h-8 rounded-full bg-[#5865f2] flex items-center justify-center text-white">
                 <UserIcon className="w-4 h-4" />
               </div>
               <div className="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-[#3ba55d] border-2 border-[#292b2f]"></div>
-            </div>
+            </Link>
             <div className="ml-2">
               <div className="text-white text-sm font-medium leading-tight">User</div>
               <div className="text-[#b9bbbe] text-xs leading-tight">Online</div>
@@ -216,9 +216,12 @@ export function AppShell({ children }: AppShellProps) {
           </div>
           
           <div className="flex space-x-1">
-            <button className="w-8 h-8 rounded-md hover:bg-[#36393f] flex items-center justify-center text-gray-400 hover:text-gray-200">
+            <Link 
+              href="/settings" 
+              className="w-8 h-8 rounded-md hover:bg-[#36393f] flex items-center justify-center text-gray-400 hover:text-gray-200"
+            >
               <SettingsIcon className="w-5 h-5" />
-            </button>
+            </Link>
             <ThemeToggle compact />
           </div>
         </div>
@@ -240,6 +243,23 @@ export function AppShell({ children }: AppShellProps) {
         <div className="h-12 px-4 flex items-center border-b border-[#222529] shadow-sm">
           <HashtagIcon className="w-5 h-5 mr-2 text-gray-400" />
           <h2 className="font-semibold text-white">{pathname.split('/').pop() || 'dashboard'}</h2>
+          
+          {/* Right side actions */}
+          <div className="ml-auto flex items-center space-x-2">
+            <Link
+              href="/notifications"
+              className="relative w-8 h-8 rounded-md hover:bg-[#36393f] flex items-center justify-center text-gray-400 hover:text-gray-200"
+            >
+              <BellIcon className="w-5 h-5" />
+              <span className="absolute top-0.5 right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full"></span>
+            </Link>
+            <Link
+              href="/messages" 
+              className="w-8 h-8 rounded-md hover:bg-[#36393f] flex items-center justify-center text-gray-400 hover:text-gray-200"
+            >
+              <MessageCircleIcon className="w-5 h-5" />
+            </Link>
+          </div>
         </div>
         
         <main className="flex-1 overflow-y-auto">
