@@ -119,7 +119,11 @@ export default function Dashboard() {
 
               <div className="p-4 space-y-3">
                 {upcomingEvents.map(event => (
-                  <div key={event.id} className="flex items-start space-x-4 p-4 bg-[#36393f] rounded-md hover:bg-[#40444b] transition-colors duration-200 border border-[#202225]">
+                  <Link
+                    key={event.id}
+                    href={`/event/${event.id}`}
+                    className="flex items-start space-x-4 p-4 bg-[#36393f] rounded-md hover:bg-[#40444b] transition-colors duration-200 border border-[#202225]"
+                  >
                     <div className={`${event.color} w-2 h-full rounded-full flex-shrink-0`}></div>
                     <div className="flex-grow min-w-0">
                       <h3 className="font-medium text-white truncate">
@@ -132,10 +136,10 @@ export default function Dashboard() {
                         {event.location}
                       </p>
                     </div>
-                    <button className="w-8 h-8 rounded-md hover:bg-[#4f545c] flex items-center justify-center text-[#b9bbbe] hover:text-white transition-colors">
+                    <div className="w-8 h-8 rounded-md hover:bg-[#4f545c] flex items-center justify-center text-[#b9bbbe] hover:text-white transition-colors">
                       <BellIcon className="w-5 h-5" />
-                    </button>
-                  </div>
+                    </div>
+                  </Link>
                 ))}
                 
                 <div className="text-center pt-3">
@@ -248,14 +252,35 @@ export default function Dashboard() {
                   className="flex items-center px-3 py-2 rounded-md text-[#b9bbbe] hover:bg-[#40444b] hover:text-white transition-colors"
                 >
                   <UsersIcon className="w-5 h-5 mr-3 text-[#3ba55c]" />
-                  <span>Create Group</span>
+                  <span>New Group</span>
                 </Link>
                 <Link
-                  href="/calendar/import"
+                  href="/profile"
                   className="flex items-center px-3 py-2 rounded-md text-[#b9bbbe] hover:bg-[#40444b] hover:text-white transition-colors"
                 >
-                  <HashtagIcon className="w-5 h-5 mr-3 text-[#eb459e]" />
-                  <span>Import Calendar</span>
+                  <UsersIcon className="w-5 h-5 mr-3 text-[#eb459e]" />
+                  <span>My Profile</span>
+                </Link>
+                <Link
+                  href="/settings"
+                  className="flex items-center px-3 py-2 rounded-md text-[#b9bbbe] hover:bg-[#40444b] hover:text-white transition-colors"
+                >
+                  <HashtagIcon className="w-5 h-5 mr-3 text-[#faa61a]" />
+                  <span>Settings</span>
+                </Link>
+                <Link
+                  href="/notifications"
+                  className="flex items-center px-3 py-2 rounded-md text-[#b9bbbe] hover:bg-[#40444b] hover:text-white transition-colors"
+                >
+                  <BellIcon className="w-5 h-5 mr-3 text-[#ed4245]" />
+                  <span>Notifications</span>
+                </Link>
+                <Link
+                  href="/messages"
+                  className="flex items-center px-3 py-2 rounded-md text-[#b9bbbe] hover:bg-[#40444b] hover:text-white transition-colors"
+                >
+                  <CalendarIcon className="w-5 h-5 mr-3 text-[#9b59b6]" />
+                  <span>Messages</span>
                 </Link>
               </div>
             </section>
