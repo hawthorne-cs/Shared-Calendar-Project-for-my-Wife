@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { AppShell } from '@/components/app-shell'
 import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon, PlusIcon } from '@/components/icons'
+import Link from 'next/link'
 
 // Mock data for events
 const mockEvents = [
@@ -221,12 +222,13 @@ export default function CalendarPage() {
                       </div>
                       <div className="space-y-1 overflow-y-auto max-h-[80px]">
                         {day.events.map(event => (
-                          <div 
+                          <Link 
                             key={event.id}
-                            className={`${event.color} px-2 py-1 rounded text-white text-xs font-medium truncate shadow-sm`}
+                            href={`/event/${event.id}`}
+                            className={`${event.color} px-2 py-1 rounded text-white text-xs font-medium truncate shadow-sm block hover:brightness-110 transition-all`}
                           >
                             {event.title}
-                          </div>
+                          </Link>
                         ))}
                       </div>
                     </>
