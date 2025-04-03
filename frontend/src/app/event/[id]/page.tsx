@@ -228,7 +228,7 @@ export default function EventPage({ params }: { params: { id: string } }) {
                   {/* Organizer */}
                   <div>
                     <h2 className="text-lg font-medium text-white mb-3">
-                      <UserIcon className="w-5 h-5 inline-block mr-2 text-[#b9bbbe]" />
+                      <UsersIcon className="w-5 h-5 inline-block mr-2 text-[#b9bbbe]" />
                       Organizer
                     </h2>
                     <div className="bg-[#36393f] rounded-md p-4 text-white">
