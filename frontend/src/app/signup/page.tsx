@@ -64,14 +64,17 @@ export default function SignupPage() {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000))
       
-      // In a real app, you would call your API to create the user
-      // For now, just redirect to login
-      router.push('/login?registered=true')
+      // For testing/demo purposes, go directly to dashboard
+      router.push('/dashboard')
     } catch (err) {
       setErrors({ form: 'An error occurred. Please try again.' })
     } finally {
       setLoading(false)
     }
+  }
+  
+  const continueAsGuest = () => {
+    router.push('/dashboard')
   }
 
   return (
@@ -202,6 +205,23 @@ export default function SignupPage() {
                 {loading ? 'Creating Account...' : 'Create Account'}
               </button>
             </div>
+            
+            <div className="relative py-2">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-[#202225]"></div>
+              </div>
+              <div className="relative flex justify-center">
+                <span className="px-2 bg-[#2f3136] text-[#b9bbbe] text-xs">OR</span>
+              </div>
+            </div>
+            
+            <button 
+              type="button"
+              onClick={continueAsGuest}
+              className="w-full py-2.5 rounded-md font-medium bg-[#4f545c] text-white hover:bg-[#40444b] transition-colors"
+            >
+              Continue as Guest
+            </button>
 
             <p className="text-sm text-[#b9bbbe] pt-2">
               Already have an account?{' '}

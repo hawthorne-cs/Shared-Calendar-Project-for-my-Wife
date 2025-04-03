@@ -43,7 +43,7 @@ export default function Home() {
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white">
                 Share calendars like <span className="text-[#5865f2]">never before</span>
-              </h1>
+        </h1>
               <p className="text-lg text-[#b9bbbe]">
                 A Discord-inspired platform where friends, couples, and groups can share schedules, 
                 collaborate on events, and stay connected without the hassle.
@@ -53,7 +53,7 @@ export default function Home() {
                   href="/signup" 
                   className="px-6 py-3 rounded-md bg-[#5865f2] text-white hover:bg-[#4752c4] transition-colors flex items-center justify-center font-medium"
                 >
-                  Get Started
+            Get Started
                 </Link>
                 <Link 
                   href="/features" 
@@ -202,6 +202,6 @@ export default function Home() {
           </div>
         </div>
       </footer>
-    </div>
+      </div>
   )
 } 

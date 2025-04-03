@@ -22,19 +22,17 @@ export default function LoginPage() {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000))
       
-      // Validate credentials (replace with actual authentication)
-      if (email === 'user@example.com' && password === 'password') {
-        // Success - redirect to dashboard
-        router.push('/dashboard')
-      } else {
-        // Failed login
-        setError('Invalid email or password')
-      }
+      // For development/testing purposes - any credentials work
+      router.push('/dashboard')
     } catch (err) {
       setError('An error occurred. Please try again.')
     } finally {
       setLoading(false)
     }
+  }
+
+  const continueAsGuest = () => {
+    router.push('/dashboard')
   }
 
   return (
@@ -113,6 +111,23 @@ export default function LoginPage() {
               }`}
             >
               {loading ? 'Logging in...' : 'Log In'}
+            </button>
+            
+            <div className="relative py-2">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-[#202225]"></div>
+              </div>
+              <div className="relative flex justify-center">
+                <span className="px-2 bg-[#2f3136] text-[#b9bbbe] text-xs">OR</span>
+              </div>
+            </div>
+            
+            <button 
+              type="button"
+              onClick={continueAsGuest}
+              className="w-full py-2.5 rounded-md font-medium bg-[#4f545c] text-white hover:bg-[#40444b] transition-colors"
+            >
+              Continue as Guest
             </button>
 
             <p className="text-sm text-[#b9bbbe] pt-2">
