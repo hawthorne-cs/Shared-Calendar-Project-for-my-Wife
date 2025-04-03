@@ -175,6 +175,13 @@ export default function CalendarPage() {
               >
                 <ChevronRightIcon className="w-5 h-5" />
               </button>
+              <Link 
+                href="/event/new"
+                className="ml-2 px-4 py-2 bg-[#5865f2] text-white rounded-md hover:bg-[#4752c4] transition-colors flex items-center"
+              >
+                <PlusIcon className="w-4 h-4 mr-1" />
+                Add Event
+              </Link>
             </div>
           </div>
           
@@ -216,9 +223,12 @@ export default function CalendarPage() {
                         >
                           {day.day}
                         </span>
-                        <button className="w-5 h-5 rounded-full bg-[#36393f] border border-[#202225] flex items-center justify-center text-[#b9bbbe] hover:text-white hover:bg-[#40444b] hover:border-[#b9bbbe] transition-colors">
+                        <Link 
+                          href={day.date ? `/event/new?date=${day.date.toISOString().split('T')[0]}` : '#'}
+                          className="w-5 h-5 rounded-full bg-[#36393f] border border-[#202225] flex items-center justify-center text-[#b9bbbe] hover:text-white hover:bg-[#40444b] hover:border-[#b9bbbe] transition-colors"
+                        >
                           <PlusIcon className="w-3 h-3" />
-                        </button>
+                        </Link>
                       </div>
                       <div className="space-y-1 overflow-y-auto max-h-[80px]">
                         {day.events.map(event => (

@@ -247,6 +247,13 @@ export function AppShell({ children }: AppShellProps) {
           {/* Right side actions */}
           <div className="ml-auto flex items-center space-x-2">
             <Link
+              href="/event/new"
+              className="px-3 py-1 bg-[#5865f2] text-white rounded-md hover:bg-[#4752c4] transition-colors flex items-center"
+            >
+              <PlusIcon className="w-4 h-4 mr-1" />
+              New Event
+            </Link>
+            <Link
               href="/notifications"
               className="relative w-8 h-8 rounded-md hover:bg-[#36393f] flex items-center justify-center text-gray-400 hover:text-gray-200"
             >

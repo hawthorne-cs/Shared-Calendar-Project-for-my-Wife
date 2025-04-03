@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { AppShell } from '@/components/app-shell'
 import { CalendarIcon } from '@/components/icons'
 
@@ -28,10 +28,15 @@ interface EventFormData {
 
 export default function NewEventPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  
+  // Get date from URL parameters, or use today's date
+  const dateFromParams = searchParams.get('date')
+  
   const [formData, setFormData] = useState<EventFormData>({
     title: '',
     description: '',
-    date: new Date().toISOString().split('T')[0],
+    date: dateFromParams || new Date().toISOString().split('T')[0],
     startTime: '09:00',
     endTime: '10:00',
     location: '',
@@ -41,6 +46,16 @@ export default function NewEventPage() {
     recurringType: 'weekly',
     notificationTime: '15min'
   })
+  
+  // Update date when URL parameter changes
+  useEffect(() => {
+    if (dateFromParams) {
+      setFormData(prev => ({
+        ...prev,
+        date: dateFromParams
+      }))
+    }
+  }, [dateFromParams])
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
