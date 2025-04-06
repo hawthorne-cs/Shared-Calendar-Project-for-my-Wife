@@ -3,12 +3,13 @@
 import { useState } from 'react'
 import { AppShell } from '@/components/app-shell'
 import { SettingsIcon, BellIcon, MoonIcon, SunIcon, UserIcon } from '@/components/icons'
+import { useTheme } from '@/context/ThemeContext'
 
 type SettingsCategory = 'appearance' | 'notifications' | 'privacy' | 'account'
 
 export default function SettingsPage() {
+  const { theme, setTheme } = useTheme()
   const [activeCategory, setActiveCategory] = useState<SettingsCategory>('appearance')
-  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('dark')
   const [notificationSettings, setNotificationSettings] = useState({
     emailNotifications: true,
     pushNotifications: true,
@@ -24,15 +25,20 @@ export default function SettingsPage() {
     showEmail: false
   })
   
-  // Toggle function for checkbox settings
-  const toggleSetting = (setting: keyof typeof notificationSettings) => {
-    setNotificationSettings(prev => ({
-      ...prev,
-      [setting]: !prev[setting]
-    }))
+  const toggleSetting = (setting: keyof typeof notificationSettings | keyof typeof privacySettings, type: 'notification' | 'privacy') => {
+    if (type === 'notification') {
+      setNotificationSettings(prev => ({
+        ...prev,
+        [setting]: !prev[setting as keyof typeof notificationSettings]
+      }))
+    } else {
+      setPrivacySettings(prev => ({
+        ...prev,
+        [setting]: !prev[setting as keyof typeof privacySettings]
+      }))
+    }
   }
   
-  // Handle dropdown changes
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>, settingType: 'notification' | 'privacy') => {
     const { name, value } = e.target
     
@@ -49,7 +55,6 @@ export default function SettingsPage() {
     }
   }
   
-  // Save settings
   const saveSettings = () => {
     console.log('Saving settings:', {
       theme,
@@ -57,18 +62,16 @@ export default function SettingsPage() {
       privacySettings
     })
     
-    // Here you would normally make an API call to save the settings
     alert('Settings saved successfully!')
   }
   
   return (
     <AppShell>
-      <div className="bg-[#36393f] min-h-screen">
+      <div className="bg-white dark:bg-[#36393f] min-h-screen">
         <div className="container mx-auto px-4 py-8 max-w-6xl">
           <div className="flex flex-col md:flex-row gap-6">
-            {/* Sidebar */}
-            <div className="w-full md:w-64 bg-[#2f3136] rounded-lg p-4">
-              <h2 className="text-white font-semibold mb-4 px-2 flex items-center">
+            <div className="w-full md:w-64 bg-[#f7f6f3] dark:bg-[#2f3136] rounded-lg p-4 border border-[#e6e6e6] dark:border-[#202225]">
+              <h2 className="text-[#37352f] dark:text-white font-semibold mb-4 px-2 flex items-center">
                 <SettingsIcon className="w-5 h-5 mr-2" />
                 User Settings
               </h2>
@@ -85,36 +88,34 @@ export default function SettingsPage() {
                     onClick={() => setActiveCategory(category.id as SettingsCategory)}
                     className={`flex items-center w-full px-2 py-2 text-sm font-medium rounded-md transition-colors ${
                       activeCategory === category.id
-                        ? 'bg-[#393c43] text-white'
-                        : 'text-[#b9bbbe] hover:bg-[#36393f] hover:text-white'
+                        ? 'bg-[#e6e6e6] dark:bg-[#393c43] text-[#37352f] dark:text-white'
+                        : 'text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#e6e6e6] dark:hover:bg-[#36393f] hover:text-[#37352f] dark:hover:text-white'
                     }`}
                   >
-                    <span className="mr-3 text-[#b9bbbe]">{category.icon}</span>
+                    <span className="mr-3 text-[#6b7280] dark:text-[#b9bbbe]">{category.icon}</span>
                     {category.label}
                   </button>
                 ))}
               </nav>
             </div>
             
-            {/* Main content */}
-            <div className="flex-1 bg-[#2f3136] rounded-lg p-6">
-              {/* Appearance Settings */}
+            <div className="flex-1 bg-white dark:bg-[#2f3136] rounded-lg p-6 border border-[#e6e6e6] dark:border-[#202225]">
               {activeCategory === 'appearance' && (
                 <div>
-                  <h2 className="text-xl font-semibold text-white mb-6">Appearance</h2>
+                  <h2 className="text-xl font-semibold text-[#37352f] dark:text-white mb-6">Appearance</h2>
                   
                   <div className="space-y-6">
                     <div>
-                      <h3 className="text-white font-medium mb-2">Theme</h3>
-                      <p className="text-[#b9bbbe] text-sm mb-4">Choose how Calendar looks for you.</p>
+                      <h3 className="text-[#37352f] dark:text-white font-medium mb-2">Theme</h3>
+                      <p className="text-[#6b7280] dark:text-[#b9bbbe] text-sm mb-4">Choose how Calendar looks for you.</p>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <button
                           onClick={() => setTheme('dark')}
-                          className={`p-4 rounded-lg transition-colors ${
+                          className={`p-4 rounded-lg border transition-colors ${
                             theme === 'dark' 
-                              ? 'bg-[#5865f2] text-white' 
-                              : 'bg-[#36393f] text-[#dcddde] hover:bg-[#40444b]'
+                              ? 'bg-[#5865f2] text-white border-[#5865f2]' 
+                              : 'bg-[#f0f0f0] dark:bg-[#36393f] text-[#37352f] dark:text-[#dcddde] border-[#e6e6e6] dark:border-[#40444b] hover:bg-[#e6e6e6] dark:hover:bg-[#40444b]'
                           }`}
                         >
                           <div className="flex justify-center mb-3">
@@ -125,10 +126,10 @@ export default function SettingsPage() {
                         
                         <button
                           onClick={() => setTheme('light')}
-                          className={`p-4 rounded-lg transition-colors ${
+                          className={`p-4 rounded-lg border transition-colors ${
                             theme === 'light' 
-                              ? 'bg-[#5865f2] text-white' 
-                              : 'bg-[#36393f] text-[#dcddde] hover:bg-[#40444b]'
+                              ? 'bg-[#5865f2] text-white border-[#5865f2]' 
+                              : 'bg-[#f0f0f0] dark:bg-[#36393f] text-[#37352f] dark:text-[#dcddde] border-[#e6e6e6] dark:border-[#40444b] hover:bg-[#e6e6e6] dark:hover:bg-[#40444b]'
                           }`}
                         >
                           <div className="flex justify-center mb-3">
@@ -136,105 +137,74 @@ export default function SettingsPage() {
                           </div>
                           <div className="font-medium">Light</div>
                         </button>
-                        
-                        <button
-                          onClick={() => setTheme('system')}
-                          className={`p-4 rounded-lg transition-colors ${
-                            theme === 'system' 
-                              ? 'bg-[#5865f2] text-white' 
-                              : 'bg-[#36393f] text-[#dcddde] hover:bg-[#40444b]'
-                          }`}
-                        >
-                          <div className="flex justify-center mb-3">
-                            <div className="w-8 h-8 flex">
-                              <div className="w-1/2 flex items-center justify-center border-r border-[#dcddde]">
-                                <MoonIcon className="w-4 h-4" />
-                              </div>
-                              <div className="w-1/2 flex items-center justify-center">
-                                <SunIcon className="w-4 h-4" />
-                              </div>
-                            </div>
-                          </div>
-                          <div className="font-medium">Sync with System</div>
-                        </button>
                       </div>
-                    </div>
-                    
-                    <div className="pt-4">
-                      <button 
-                        onClick={saveSettings}
-                        className="px-4 py-2 bg-[#5865f2] text-white rounded-md hover:bg-[#4752c4] transition-colors"
-                      >
-                        Save Changes
-                      </button>
                     </div>
                   </div>
                 </div>
               )}
               
-              {/* Notification Settings */}
               {activeCategory === 'notifications' && (
                 <div>
-                  <h2 className="text-xl font-semibold text-white mb-6">Notification Settings</h2>
+                  <h2 className="text-xl font-semibold text-[#37352f] dark:text-white mb-6">Notification Settings</h2>
                   
                   <div className="space-y-6">
                     <div className="space-y-4">
-                      <div className="flex items-center justify-between py-2">
+                      <div className="flex items-center justify-between py-2 border-b border-[#e6e6e6] dark:border-[#40444b]">
                         <div>
-                          <div className="text-white">Email Notifications</div>
-                          <div className="text-sm text-[#b9bbbe]">Receive email notifications about events and updates</div>
+                          <div className="text-[#37352f] dark:text-white">Email Notifications</div>
+                          <div className="text-sm text-[#6b7280] dark:text-[#b9bbbe]">Receive email notifications about events and updates</div>
                         </div>
                         <label className="relative inline-flex items-center cursor-pointer">
                           <input 
                             type="checkbox" 
                             checked={notificationSettings.emailNotifications}
-                            onChange={() => toggleSetting('emailNotifications')} 
+                            onChange={() => toggleSetting('emailNotifications', 'notification')} 
                             className="sr-only peer" 
                           />
-                          <div className="w-11 h-6 bg-[#4f545c] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#5865f2]"></div>
+                          <div className="w-11 h-6 bg-[#e6e6e6] dark:bg-[#4f545c] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#5865f2]"></div>
                         </label>
                       </div>
                       
-                      <div className="flex items-center justify-between py-2">
+                      <div className="flex items-center justify-between py-2 border-b border-[#e6e6e6] dark:border-[#40444b]">
                         <div>
-                          <div className="text-white">Push Notifications</div>
-                          <div className="text-sm text-[#b9bbbe]">Receive notifications in your browser</div>
+                          <div className="text-[#37352f] dark:text-white">Push Notifications</div>
+                          <div className="text-sm text-[#6b7280] dark:text-[#b9bbbe]">Receive notifications in your browser</div>
                         </div>
                         <label className="relative inline-flex items-center cursor-pointer">
                           <input 
                             type="checkbox" 
                             checked={notificationSettings.pushNotifications}
-                            onChange={() => toggleSetting('pushNotifications')} 
+                            onChange={() => toggleSetting('pushNotifications', 'notification')} 
                             className="sr-only peer" 
                           />
-                          <div className="w-11 h-6 bg-[#4f545c] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#5865f2]"></div>
+                          <div className="w-11 h-6 bg-[#e6e6e6] dark:bg-[#4f545c] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#5865f2]"></div>
                         </label>
                       </div>
                       
-                      <div className="flex items-center justify-between py-2">
+                      <div className="flex items-center justify-between py-2 border-b border-[#e6e6e6] dark:border-[#40444b]">
                         <div>
-                          <div className="text-white">Event Reminders</div>
-                          <div className="text-sm text-[#b9bbbe]">Get reminded before your events start</div>
+                          <div className="text-[#37352f] dark:text-white">Event Reminders</div>
+                          <div className="text-sm text-[#6b7280] dark:text-[#b9bbbe]">Get reminded before your events start</div>
                         </div>
                         <label className="relative inline-flex items-center cursor-pointer">
                           <input 
                             type="checkbox" 
                             checked={notificationSettings.eventReminders}
-                            onChange={() => toggleSetting('eventReminders')} 
+                            onChange={() => toggleSetting('eventReminders', 'notification')} 
                             className="sr-only peer" 
                           />
-                          <div className="w-11 h-6 bg-[#4f545c] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#5865f2]"></div>
+                          <div className="w-11 h-6 bg-[#e6e6e6] dark:bg-[#4f545c] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#5865f2]"></div>
                         </label>
                       </div>
                       
                       {notificationSettings.eventReminders && (
-                        <div className="ml-6 bg-[#36393f] p-4 rounded-md">
-                          <label className="block text-white mb-2">Reminder Time</label>
+                        <div className="ml-6 pt-4">
+                          <label className="block text-[#37352f] dark:text-white mb-2">Reminder Time</label>
                           <select 
                             name="reminderTime"
                             value={notificationSettings.reminderTime}
                             onChange={(e) => handleSelectChange(e, 'notification')}
-                            className="w-full px-4 py-2 rounded-md bg-[#40444b] border border-[#202225] text-white focus:outline-none focus:ring-2 focus:ring-[#5865f2]"
+                            className="w-full px-4 py-2 rounded-md bg-[#f0f0f0] dark:bg-[#40444b] border border-[#e6e6e6] dark:border-[#202225] text-[#37352f] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#5865f2]"
                           >
                             <option value="10">10 minutes before</option>
                             <option value="15">15 minutes before</option>
@@ -245,6 +215,22 @@ export default function SettingsPage() {
                           </select>
                         </div>
                       )}
+
+                      <div className="flex items-center justify-between py-2 border-b border-[#e6e6e6] dark:border-[#40444b]">
+                        <div>
+                          <div className="text-[#37352f] dark:text-white">Group Activity</div>
+                          <div className="text-sm text-[#6b7280] dark:text-[#b9bbbe]">Notifications for new messages or events in your groups</div>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input 
+                            type="checkbox" 
+                            checked={notificationSettings.groupActivity}
+                            onChange={() => toggleSetting('groupActivity', 'notification')} 
+                            className="sr-only peer" 
+                          />
+                          <div className="w-11 h-6 bg-[#e6e6e6] dark:bg-[#4f545c] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#5865f2]"></div>
+                        </label>
+                      </div>
                     </div>
                     
                     <div className="pt-4">
@@ -252,47 +238,62 @@ export default function SettingsPage() {
                         onClick={saveSettings}
                         className="px-4 py-2 bg-[#5865f2] text-white rounded-md hover:bg-[#4752c4] transition-colors"
                       >
-                        Save Changes
+                        Save Notification Settings
                       </button>
                     </div>
                   </div>
                 </div>
               )}
               
-              {/* Privacy Settings */}
               {activeCategory === 'privacy' && (
                 <div>
-                  <h2 className="text-xl font-semibold text-white mb-6">Privacy & Safety</h2>
+                  <h2 className="text-xl font-semibold text-[#37352f] dark:text-white mb-6">Privacy & Safety</h2>
                   
                   <div className="space-y-6">
                     <div>
-                      <label className="block text-white mb-2">Who can see my calendar</label>
+                      <label className="block text-[#37352f] dark:text-white mb-2">Calendar Visibility</label>
+                      <p className="text-sm text-[#6b7280] dark:text-[#b9bbbe] mb-3">Control who can see your personal calendar events.</p>
                       <select 
                         name="calendarVisibility"
                         value={privacySettings.calendarVisibility}
                         onChange={(e) => handleSelectChange(e, 'privacy')}
-                        className="w-full px-4 py-2 rounded-md bg-[#40444b] border border-[#202225] text-white focus:outline-none focus:ring-2 focus:ring-[#5865f2]"
+                        className="w-full px-4 py-2 rounded-md bg-[#f0f0f0] dark:bg-[#40444b] border border-[#e6e6e6] dark:border-[#202225] text-[#37352f] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#5865f2]"
                       >
                         <option value="everyone">Everyone</option>
                         <option value="friends">Friends Only</option>
-                        <option value="nobody">Just Me</option>
+                        <option value="nobody">Nobody (Just Me)</option>
                       </select>
-                      <p className="mt-1 text-sm text-[#b9bbbe]">Choose who can view your calendar events</p>
                     </div>
-                    
+
                     <div>
-                      <label className="block text-white mb-2">Who can invite me to events</label>
+                      <label className="block text-[#37352f] dark:text-white mb-2">Allow Group Invites From</label>
+                      <p className="text-sm text-[#6b7280] dark:text-[#b9bbbe] mb-3">Control who can send you invitations to join groups.</p>
                       <select 
                         name="allowInvites"
                         value={privacySettings.allowInvites}
                         onChange={(e) => handleSelectChange(e, 'privacy')}
-                        className="w-full px-4 py-2 rounded-md bg-[#40444b] border border-[#202225] text-white focus:outline-none focus:ring-2 focus:ring-[#5865f2]"
+                        className="w-full px-4 py-2 rounded-md bg-[#f0f0f0] dark:bg-[#40444b] border border-[#e6e6e6] dark:border-[#202225] text-[#37352f] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#5865f2]"
                       >
                         <option value="everyone">Everyone</option>
                         <option value="friends">Friends Only</option>
                         <option value="nobody">Nobody</option>
                       </select>
-                      <p className="mt-1 text-sm text-[#b9bbbe]">Control who can send you event invitations</p>
+                    </div>
+
+                    <div className="flex items-center justify-between py-2 border-t border-b border-[#e6e6e6] dark:border-[#40444b]">
+                      <div>
+                        <div className="text-[#37352f] dark:text-white">Show Email on Profile</div>
+                        <div className="text-sm text-[#6b7280] dark:text-[#b9bbbe]">Allow others to see your email address on your profile</div>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          checked={privacySettings.showEmail}
+                          onChange={() => toggleSetting('showEmail', 'privacy')} 
+                          className="sr-only peer" 
+                        />
+                        <div className="w-11 h-6 bg-[#e6e6e6] dark:bg-[#4f545c] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#5865f2]"></div>
+                      </label>
                     </div>
                     
                     <div className="pt-4">
@@ -300,61 +301,29 @@ export default function SettingsPage() {
                         onClick={saveSettings}
                         className="px-4 py-2 bg-[#5865f2] text-white rounded-md hover:bg-[#4752c4] transition-colors"
                       >
-                        Save Changes
+                        Save Privacy Settings
                       </button>
                     </div>
                   </div>
                 </div>
               )}
               
-              {/* Account Settings */}
               {activeCategory === 'account' && (
                 <div>
-                  <h2 className="text-xl font-semibold text-white mb-6">My Account</h2>
-                  
+                  <h2 className="text-xl font-semibold text-[#37352f] dark:text-white mb-6">My Account</h2>
                   <div className="space-y-6">
-                    <div className="flex flex-col md:flex-row md:items-center p-4 bg-[#36393f] rounded-lg">
-                      <div className="flex-shrink-0 mb-4 md:mb-0 md:mr-4">
-                        <div className="w-16 h-16 rounded-full bg-[#5865f2] flex items-center justify-center text-white text-2xl font-medium">
-                          A
-                        </div>
-                      </div>
-                      <div className="flex-grow">
-                        <h3 className="text-white font-medium">Alex Taylor</h3>
-                        <p className="text-[#b9bbbe]">alex.taylor@example.com</p>
-                      </div>
-                      <div className="mt-4 md:mt-0">
-                        <a href="/profile" className="px-4 py-2 bg-[#4f545c] text-white rounded-md hover:bg-[#5d6269] transition-colors inline-block">
-                          Edit Profile
-                        </a>
-                      </div>
+                    <div className="bg-[#f0f0f0] dark:bg-[#40444b] p-4 rounded-md border border-[#e6e6e6] dark:border-[#202225]">
+                      <h3 className="text-lg font-medium text-[#37352f] dark:text-white mb-2">Account Information</h3>
+                      <p className="text-sm text-[#6b7280] dark:text-[#b9bbbe]">Manage your account details and security.</p>
                     </div>
                     
-                    <div>
-                      <h3 className="text-white font-medium mb-4">Account Management</h3>
-                      
-                      <div className="space-y-2">
-                        <button className="w-full text-left px-4 py-3 bg-[#36393f] hover:bg-[#40444b] rounded-md text-white transition-colors">
-                          Change Password
-                        </button>
-                        <button className="w-full text-left px-4 py-3 bg-[#36393f] hover:bg-[#40444b] rounded-md text-white transition-colors">
-                          Two-Factor Authentication
-                        </button>
-                        <button className="w-full text-left px-4 py-3 bg-[#36393f] hover:bg-[#40444b] rounded-md text-white transition-colors">
-                          Connected Accounts
-                        </button>
-                      </div>
-                    </div>
-                    
-                    <div className="border-t border-[#40444b] pt-6 mt-6">
-                      <h3 className="text-red-400 font-medium mb-4">Danger Zone</h3>
-                      
-                      <div className="space-y-2">
-                        <button className="w-full text-left px-4 py-3 bg-[#36393f] hover:bg-[#432f30] text-[#ed4245] rounded-md transition-colors">
-                          Delete Account
-                        </button>
-                      </div>
-                    </div>
+                    <button className="px-4 py-2 bg-[#f0f0f0] dark:bg-[#4f545c] text-[#37352f] dark:text-white rounded-md hover:bg-[#e6e6e6] dark:hover:bg-[#5d6269] transition-colors border border-[#e6e6e6] dark:border-[#202225]">
+                      Change Password
+                    </button>
+
+                    <button className="px-4 py-2 bg-[#ed4245] text-white rounded-md hover:bg-[#c03537] transition-colors">
+                      Delete Account
+                    </button>
                   </div>
                 </div>
               )}
