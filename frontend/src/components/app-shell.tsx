@@ -1,339 +1,295 @@
 "use client"
 
-import { useState } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { ThemeToggle } from "@/components/theme-toggle"
-import { useTheme } from "@/components/theme-provider"
+import { useState, useEffect, createContext, useContext } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { 
+  HomeIcon, 
   CalendarIcon, 
-  UserIcon, 
-  UsersIcon,
-  SettingsIcon,
-  ChevronLeftIcon,
+  UsersIcon, 
+  MessageCircleIcon, 
+  BellIcon, 
+  SettingsIcon, 
+  LogOutIcon, 
+  MoonIcon, 
+  SunIcon, 
+  ChevronLeftIcon, 
   ChevronRightIcon,
-  HomeIcon,
-  BellIcon,
-  MessageCircleIcon,
-  LogOutIcon,
-  MoonIcon,
-  SunIcon,
-  GlobeIcon,
-  ImageIcon,
   PlusIcon,
-  HashtagIcon
-} from "@/components/icons"
+  SearchIcon
+} from './icons'
 
-interface AppShellProps {
-  children: React.ReactNode
-}
+// Theme context
+const ThemeContext = createContext({
+  theme: 'dark',
+  toggleTheme: () => {}
+});
 
-export function AppShell({ children }: AppShellProps) {
-  const pathname = usePathname()
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const [channelSectionExpanded, setChannelSectionExpanded] = useState(true)
-  const { theme } = useTheme()
+export const useTheme = () => useContext(ThemeContext);
 
-  // Mock data for workspaces
-  const workspaces = [
-    { id: "personal", name: "Personal", icon: <CalendarIcon className="w-5 h-5" />, color: "bg-blue-500" },
-    { id: "work", name: "Work", icon: <UsersIcon className="w-5 h-5" />, color: "bg-green-500" },
-    { id: "family", name: "Family", icon: <HomeIcon className="w-5 h-5" />, color: "bg-purple-500" },
-    { id: "friends", name: "Friends", icon: <GlobeIcon className="w-5 h-5" />, color: "bg-yellow-500" },
-  ]
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme, setTheme] = useState('dark');
 
-  // Mock spaces data (replaces channels)
-  const spaces = [
-    { id: "calendar", name: "Calendar", icon: <CalendarIcon className="w-4 h-4" /> },
-    { id: "events", name: "Events", icon: <HashtagIcon className="w-4 h-4" /> },
-    { id: "planning", name: "Planning", icon: <HomeIcon className="w-4 h-4" /> },
-    { id: "notes", name: "Notes", icon: <HashtagIcon className="w-4 h-4" /> },
-  ]
+  useEffect(() => {
+    const localTheme = window.localStorage.getItem('theme');
+    if (localTheme) {
+      setTheme(localTheme);
+      document.documentElement.classList.toggle('dark', localTheme === 'dark');
+    } else {
+      document.documentElement.classList.add('dark'); // Default to dark
+    }
+  }, []);
 
-  const mainNavItems = [
-    {
-      name: "Dashboard",
-      href: "/dashboard",
-      icon: <HomeIcon className="w-5 h-5" />,
-    },
-    {
-      name: "Calendar",
-      href: "/calendar",
-      icon: <CalendarIcon className="w-5 h-5" />,
-    },
-    {
-      name: "Groups",
-      href: "/groups",
-      icon: <UsersIcon className="w-5 h-5" />,
-    },
-    {
-      name: "Messages",
-      href: "/messages",
-      icon: <MessageCircleIcon className="w-5 h-5" />,
-    },
-    {
-      name: "Notifications",
-      href: "/notifications",
-      icon: <BellIcon className="w-5 h-5" />,
-    },
-  ]
-
-  const bottomNavItems = [
-    {
-      name: "Profile",
-      href: "/profile",
-      icon: <UserIcon className="w-5 h-5" />,
-    },
-    {
-      name: "Settings",
-      href: "/settings",
-      icon: <SettingsIcon className="w-5 h-5" />,
-    },
-  ]
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    window.localStorage.setItem('theme', newTheme);
+    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+  };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#f7f6f3] dark:bg-[#2f3136]">
-      {/* Workspaces sidebar - Notion style */}
-      <aside className="w-[72px] bg-[#f7f6f3] dark:bg-[#202225] flex flex-col items-center py-6 space-y-5 border-r border-[#e6e6e6] dark:border-[#1e1f22]">
-        {/* Home button */}
-        <Link 
-          href="/dashboard" 
-          className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200 hover:bg-[#eeeeee] dark:hover:bg-[#36393f] ${
-            pathname === "/dashboard" ? "bg-[#eeeeee] text-black dark:bg-[#5865f2] dark:text-white" : "text-[#37352f] dark:text-gray-300"
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+
+// AppShell component
+interface NavItem {
+  href: string;
+  icon: React.ElementType;
+  label: string;
+  match?: (pathname: string) => boolean; // Optional more specific matching function
+}
+
+const mainNavItems: NavItem[] = [
+  { href: '/dashboard', icon: HomeIcon, label: 'Dashboard', match: (p) => p === '/dashboard' },
+  { href: '/calendar', icon: CalendarIcon, label: 'Calendar', match: (p) => p.startsWith('/calendar') || p.startsWith('/event') }, // Match calendar and event pages
+  { href: '/groups', icon: UsersIcon, label: 'Groups', match: (p) => p.startsWith('/groups') },
+  // Removed Messages and Notifications as they are in the header
+];
+
+const accountNavItems: NavItem[] = [
+  { href: '/profile', icon: UsersIcon, label: 'My Profile' },
+  { href: '/settings', icon: SettingsIcon, label: 'Settings' },
+];
+
+// Define page metadata (for header)
+const pageMetadata: { [key: string]: { title: string; icon: React.ElementType } } = {
+  '/dashboard': { title: 'Dashboard', icon: HomeIcon },
+  '/calendar': { title: 'Calendar', icon: CalendarIcon },
+  '/event/new': { title: 'New Event', icon: PlusIcon },
+  // Dynamic route for event detail - handled separately
+  '/groups': { title: 'Groups', icon: UsersIcon },
+  '/groups/new': { title: 'New Group', icon: PlusIcon },
+  // Dynamic route for group detail - handled separately
+  '/profile': { title: 'Profile', icon: UsersIcon },
+  '/settings': { title: 'Settings', icon: SettingsIcon },
+  '/messages': { title: 'Messages', icon: MessageCircleIcon },
+  '/notifications': { title: 'Notifications', icon: BellIcon },
+};
+
+export function AppShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const { theme, toggleTheme } = useTheme();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  // Determine current page title and icon for the header
+  let currentPageTitle = 'App';
+  let CurrentPageIcon: React.ElementType | null = null;
+
+  // Handle dynamic routes like /event/[id] or /groups/[id]
+  if (pathname.startsWith('/event/') && pathname !== '/event/new') {
+    currentPageTitle = 'Event Details'; // Placeholder, could fetch event title
+    CurrentPageIcon = CalendarIcon;
+  } else if (pathname.startsWith('/groups/') && pathname !== '/groups/new') {
+    currentPageTitle = 'Group Details'; // Placeholder, could fetch group name
+    CurrentPageIcon = UsersIcon;
+  } else if (pageMetadata[pathname]) {
+    currentPageTitle = pageMetadata[pathname].title;
+    CurrentPageIcon = pageMetadata[pathname].icon;
+  } else {
+    // Fallback for unmatched paths
+    const matchedMainItem = mainNavItems.find(item => item.match ? item.match(pathname) : pathname.startsWith(item.href));
+    if (matchedMainItem) {
+      currentPageTitle = matchedMainItem.label;
+      CurrentPageIcon = matchedMainItem.icon;
+    }
+  }
+
+  return (
+    <ThemeProvider>
+      <div className={`flex h-screen bg-[#fbfbfa] dark:bg-[#202225]`}>
+        {/* Collapsible Sidebar */}
+        <aside 
+          className={`relative flex flex-col bg-white dark:bg-[#2f3136] transition-all duration-300 ease-in-out border-r border-[#e6e6e6] dark:border-[#202225] ${
+            isSidebarOpen ? 'w-64' : 'w-20'
           }`}
         >
-          <HomeIcon className="w-5 h-5" />
-        </Link>
-
-        <div className="w-8 h-0.5 bg-[#e6e6e6] dark:bg-[#36393f] rounded-full"></div>
-
-        {/* Workspace icons - Notion style */}
-        {workspaces.map((workspace) => (
-          <Link 
-            key={workspace.id}
-            href={`/workspace/${workspace.id}`}
-            className="group relative"
-          >
-            <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200 hover:bg-[#eeeeee] dark:hover:bg-[#36393f] ${
-              pathname === `/workspace/${workspace.id}` 
-                ? "bg-[#eeeeee] dark:bg-[#36393f]" 
-                : "bg-white dark:bg-[#2b2d31]"
-            } shadow-sm border border-[#e6e6e6] dark:border-[#1e1f22] text-[#37352f] dark:text-white`}>
-              {workspace.icon}
-            </div>
-            {/* Workspace tooltip */}
-            <div className="absolute left-full ml-2 py-1 px-2 bg-[#37352f] dark:bg-[#111214] text-white rounded shadow-lg text-xs whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-              {workspace.name}
-            </div>
-          </Link>
-        ))}
-
-        {/* Add workspace button */}
-        <button className="w-10 h-10 rounded-lg flex items-center justify-center bg-white dark:bg-[#2b2d31] text-[#37352f] dark:text-[#3ba55d] hover:bg-[#eeeeee] dark:hover:bg-[#36393f] transition-all duration-200 shadow-sm border border-[#e6e6e6] dark:border-[#1e1f22]">
-          <PlusIcon className="w-5 h-5" />
-        </button>
-      </aside>
-
-      {/* Sidebar - Notion style */}
-      <aside 
-        className={`flex flex-col bg-[#fbfbfa] dark:bg-[#2f3136] ${
-          sidebarCollapsed ? "w-0 opacity-0" : "w-64 opacity-100"
-        } transition-all duration-300 overflow-hidden border-r border-[#e6e6e6] dark:border-[#1e1f22]`}
-      >
-        {/* Workspace header */}
-        <div className="h-14 px-4 flex items-center border-b border-[#e6e6e6] dark:border-[#222529]">
-          <h2 className="font-medium text-[#37352f] dark:text-white flex items-center">
-            <span className="w-6 h-6 rounded flex items-center justify-center bg-[#5865f2] text-white mr-2">
-              C
-            </span>
-            Calendar Workspace
-          </h2>
-          <button
-            onClick={() => setSidebarCollapsed(true)}
-            className="ml-auto text-[#6b7280] dark:text-gray-400 hover:text-[#37352f] dark:hover:text-gray-200"
-          >
-            <ChevronLeftIcon className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* Search bar - Notion style */}
-        <div className="px-2 py-3">
-          <div className="h-9 px-3 bg-[#eeeeee] dark:bg-[#202225] flex items-center rounded-md">
-            <svg className="w-4 h-4 text-[#6b7280] dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input 
-              type="text" 
-              placeholder="Search" 
-              className="bg-transparent border-0 w-full px-2 text-sm text-[#37352f] dark:text-white focus:outline-none focus:ring-0"
-            />
-          </div>
-        </div>
-
-        {/* Main content */}
-        <div className="flex-1 overflow-y-auto pt-3 px-2">
-          {/* Quick actions */}
-          <div className="mb-5">
-            <Link
-              href="/event/new"
-              className="h-9 w-full px-3 mb-1 flex items-center rounded-md text-[#37352f] dark:text-white hover:bg-[#eeeeee] dark:hover:bg-[#393c43] transition-colors text-sm"
-            >
-              <PlusIcon className="w-4 h-4 mr-2 text-[#5865f2]" />
-              New Event
+          {/* Sidebar Header */}
+          <div className="h-16 flex items-center px-4 border-b border-[#e6e6e6] dark:border-[#202225] flex-shrink-0">
+            <Link href="/dashboard" className="flex items-center gap-2 overflow-hidden">
+              <span className="text-2xl">🗓️</span>
+              {isSidebarOpen && <span className="text-lg font-semibold text-[#37352f] dark:text-white whitespace-nowrap">SharedCal</span>}
             </Link>
-            {mainNavItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`h-9 w-full px-3 mb-1 flex items-center rounded-md group ${
-                  pathname === item.href 
-                    ? "bg-[#eeeeee] dark:bg-[#393c43] text-black dark:text-white font-medium" 
-                    : "text-[#6b7280] dark:text-gray-400 hover:bg-[#eeeeee] dark:hover:bg-[#393c43] hover:text-[#37352f] dark:hover:text-white"
-                }`}
+          </div>
+
+          {/* Navigation */}
+          <nav className="flex-1 overflow-y-auto p-4 space-y-4">
+            {/* Main Navigation */}
+            <div>
+              {isSidebarOpen && <h3 className="text-xs font-semibold text-[#6b7280] dark:text-[#8e9297] uppercase mb-2 px-2">Menu</h3>}
+              <ul className="space-y-1">
+                {mainNavItems.map((item) => {
+                  const isActive = item.match ? item.match(pathname) : pathname.startsWith(item.href);
+                  return (
+                    <li key={item.href}>
+                      <Link 
+                        href={item.href}
+                        title={item.label} // Tooltip when collapsed
+                        className={`flex items-center rounded-md transition-colors duration-150 px-3 ${isSidebarOpen ? 'py-2' : 'py-3 justify-center'} ${
+                          isActive
+                            ? 'bg-[#f0f0f0] dark:bg-[#40444b] text-[#37352f] dark:text-white'
+                            : 'text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f7f6f3] dark:hover:bg-[#36393f] hover:text-[#37352f] dark:hover:text-white'
+                        }`}
+                      >
+                        <item.icon className={`w-5 h-5 ${isSidebarOpen ? 'mr-3' : 'mx-auto'} flex-shrink-0`} />
+                        {isSidebarOpen && <span className="text-sm font-medium whitespace-nowrap">{item.label}</span>}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+
+            {/* Account Navigation */}
+            <div>
+              {isSidebarOpen && <h3 className="text-xs font-semibold text-[#6b7280] dark:text-[#8e9297] uppercase mb-2 px-2">Account</h3>}
+              <ul className="space-y-1">
+                {accountNavItems.map((item) => {
+                  const isActive = pathname.startsWith(item.href);
+                  return (
+                    <li key={item.href}>
+                      <Link 
+                        href={item.href}
+                        title={item.label}
+                        className={`flex items-center rounded-md transition-colors duration-150 px-3 ${isSidebarOpen ? 'py-2' : 'py-3 justify-center'} ${
+                          isActive
+                            ? 'bg-[#f0f0f0] dark:bg-[#40444b] text-[#37352f] dark:text-white'
+                            : 'text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f7f6f3] dark:hover:bg-[#36393f] hover:text-[#37352f] dark:hover:text-white'
+                        }`}
+                      >
+                        <item.icon className={`w-5 h-5 ${isSidebarOpen ? 'mr-3' : 'mx-auto'} flex-shrink-0`} />
+                        {isSidebarOpen && <span className="text-sm font-medium whitespace-nowrap">{item.label}</span>}
+                      </Link>
+                    </li>
+                  );
+                })}
+                {/* Logout */}
+                <li>
+                  <button 
+                    title="Logout"
+                    className={`flex items-center w-full rounded-md transition-colors duration-150 px-3 text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f7f6f3] dark:hover:bg-[#36393f] hover:text-[#37352f] dark:hover:text-white ${isSidebarOpen ? 'py-2' : 'py-3 justify-center'}`}
+                  >
+                    <LogOutIcon className={`w-5 h-5 ${isSidebarOpen ? 'mr-3' : 'mx-auto'} flex-shrink-0`} />
+                    {isSidebarOpen && <span className="text-sm font-medium whitespace-nowrap">Logout</span>}
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </nav>
+
+          {/* Sidebar Footer & Toggle */}
+          <div className="p-4 border-t border-[#e6e6e6] dark:border-[#202225] mt-auto">
+            {/* User profile preview - simplified */}
+            {isSidebarOpen && (
+              <div className="flex items-center mb-3">
+                <div className="w-8 h-8 rounded-full bg-[#5865f2] flex items-center justify-center text-sm font-medium text-white mr-2">
+                  U
+                </div>
+                <div className="text-sm overflow-hidden">
+                  <p className="font-medium text-[#37352f] dark:text-white truncate">Username</p>
+                  <p className="text-xs text-[#6b7280] dark:text-[#b9bbbe] truncate">user@example.com</p>
+                </div>
+              </div>
+            )}
+            <div className={`flex ${isSidebarOpen ? 'justify-between' : 'justify-center'} items-center`}>
+              {/* Theme Toggle */}
+              <button 
+                onClick={toggleTheme}
+                title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+                className="p-2 rounded-md text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f0f0f0] dark:hover:bg-[#40444b]"
               >
-                <span className={`w-4 h-4 mr-2 ${pathname === item.href ? "text-[#5865f2]" : "text-[#6b7280] dark:text-gray-400"}`}>
-                  {item.icon}
-                </span>
-                <span className="text-sm">{item.name}</span>
-              </Link>
-            ))}
-          </div>
+                {theme === 'light' ? <MoonIcon className="w-5 h-5" /> : <SunIcon className="w-5 h-5" />}
+              </button>
 
-          {/* Spaces section - Notion style */}
-          <div className="mb-2">
-            <button 
-              onClick={() => setChannelSectionExpanded(!channelSectionExpanded)}
-              className="flex items-center w-full px-3 py-1 text-xs font-medium text-[#6b7280] dark:text-gray-400 hover:text-[#37352f] dark:hover:text-gray-200"
-            >
-              <ChevronRightIcon className={`w-3 h-3 mr-1 transition-transform ${channelSectionExpanded ? 'rotate-90' : ''}`} />
-              SPACES
-            </button>
-          </div>
-
-          {/* Spaces list - Notion style */}
-          {channelSectionExpanded && (
-            <div className="mt-1 space-y-1 pl-3">
-              {spaces.map((space) => (
-                <Link
-                  key={space.id}
-                  href={`/space/${space.id}`}
-                  className={`flex items-center px-3 py-1.5 rounded-md group ${
-                    pathname === `/space/${space.id}` 
-                      ? "bg-[#eeeeee] dark:bg-[#393c43] text-black dark:text-white" 
-                      : "text-[#6b7280] dark:text-gray-400 hover:bg-[#eeeeee] dark:hover:bg-[#393c43] hover:text-[#37352f] dark:hover:text-white"
-                  }`}
-                >
-                  <span className={`w-4 h-4 mr-2 ${pathname === `/space/${space.id}` ? "text-[#5865f2]" : "text-[#6b7280] dark:text-gray-400"}`}>
-                    {space.icon}
-                  </span>
-                  <span className="text-sm">{space.name}</span>
-                </Link>
-              ))}
-              <Link
-                href="/spaces/new"
-                className="flex items-center px-3 py-1.5 rounded-md text-[#6b7280] dark:text-gray-400 hover:bg-[#eeeeee] dark:hover:bg-[#393c43] hover:text-[#37352f] dark:hover:text-white"
+              {/* Sidebar Toggle */}
+              <button
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                title={isSidebarOpen ? 'Collapse Sidebar' : 'Expand Sidebar'}
+                className="p-2 rounded-md text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f0f0f0] dark:hover:bg-[#40444b]"
               >
-                <PlusIcon className="w-4 h-4 mr-2" />
-                <span className="text-sm">Add a page</span>
+                {isSidebarOpen ? <ChevronLeftIcon className="w-5 h-5" /> : <ChevronRightIcon className="w-5 h-5" />}
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Header */}
+          <header className="h-16 bg-white dark:bg-[#2f3136] border-b border-[#e6e6e6] dark:border-[#202225] flex items-center justify-between px-6 flex-shrink-0">
+            {/* Page Title & Icon */}
+            <div className="flex items-center gap-3">
+              {CurrentPageIcon && <CurrentPageIcon className="w-5 h-5 text-[#6b7280] dark:text-[#b9bbbe]" />}
+              <h1 className="text-lg font-medium text-[#37352f] dark:text-white whitespace-nowrap">{currentPageTitle}</h1>
+            </div>
+            
+            {/* Header Actions */}
+            <div className="flex items-center gap-3">
+              {/* Search - Simplified Placeholder */}
+              <div className="relative">
+                <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#6b7280] dark:text-[#b9bbbe]" />
+                <input 
+                  type="search" 
+                  placeholder="Search..." 
+                  className="pl-9 pr-3 py-1.5 w-48 bg-[#f0f0f0] dark:bg-[#202225] text-[#37352f] dark:text-white rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5865f2] border border-transparent dark:border-[#202225]"
+                />
+              </div>
+
+              <Link 
+                href="/event/new"
+                className="px-3 py-1.5 bg-[#5865f2] text-white rounded-md hover:bg-[#4752c4] transition-colors flex items-center text-sm"
+              >
+                <PlusIcon className="w-4 h-4 mr-1" />
+                New Event
               </Link>
-            </div>
-          )}
-        </div>
 
-        {/* User profile area - Notion style */}
-        <div className="h-14 p-2 px-4 border-t border-[#e6e6e6] dark:border-[#222529] flex items-center">
-          <Link href="/profile" className="flex items-center">
-            <div className="w-8 h-8 rounded-md bg-[#5865f2] flex items-center justify-center text-white">
-              <UserIcon className="w-4 h-4" />
-            </div>
-            <div className="ml-2">
-              <div className="text-[#37352f] dark:text-white text-sm font-medium leading-tight">User</div>
-              <div className="text-[#6b7280] dark:text-[#b9bbbe] text-xs leading-tight">Online</div>
-            </div>
-          </Link>
-          
-          <div className="ml-auto flex space-x-1">
-            <Link 
-              href="/settings" 
-              className="w-8 h-8 rounded-md hover:bg-[#eeeeee] dark:hover:bg-[#36393f] flex items-center justify-center text-[#6b7280] dark:text-gray-400 hover:text-[#37352f] dark:hover:text-gray-200"
-            >
-              <SettingsIcon className="w-5 h-5" />
-            </Link>
-            <ThemeToggle compact />
-          </div>
-        </div>
-      </aside>
+              {/* Notification Icon */}
+              <Link href="/notifications" className="p-2 rounded-full text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f0f0f0] dark:hover:bg-[#40444b] relative">
+                <BellIcon className="w-5 h-5" />
+                {/* Optional: Notification badge */}
+                {/* <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-[#ed4245] ring-2 ring-white dark:ring-[#2f3136]"></span> */}
+              </Link>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col bg-white dark:bg-[#36393f]">
-        {/* Collapsed sidebar toggle */}
-        {sidebarCollapsed && (
-          <button
-            onClick={() => setSidebarCollapsed(false)}
-            className="absolute left-[72px] top-3 z-10 w-6 h-12 bg-[#fbfbfa] dark:bg-[#2f3136] text-[#6b7280] dark:text-gray-400 hover:text-[#37352f] dark:hover:text-gray-200 rounded-r flex items-center justify-center border border-l-0 border-[#e6e6e6] dark:border-[#1e1f22]"
-          >
-            <ChevronRightIcon className="w-4 h-4" />
-          </button>
-        )}
-        
-        {/* Page header - Notion style */}
-        <div className="h-14 px-4 flex items-center border-b border-[#e6e6e6] dark:border-[#222529]">
-          <h2 className="font-medium text-[#37352f] dark:text-white flex items-center">
-            {/* Page icon based on the path */}
-            <span className="w-6 h-6 rounded-md flex items-center justify-center bg-[#eeeeee] dark:bg-[#2b2d31] text-[#5865f2] mr-2">
-              {pathname.includes('/calendar') && <CalendarIcon className="w-4 h-4" />}
-              {pathname.includes('/dashboard') && <HomeIcon className="w-4 h-4" />}
-              {pathname.includes('/messages') && <MessageCircleIcon className="w-4 h-4" />}
-              {pathname.includes('/groups') && <UsersIcon className="w-4 h-4" />}
-              {pathname.includes('/profile') && <UserIcon className="w-4 h-4" />}
-              {pathname.includes('/settings') && <SettingsIcon className="w-4 h-4" />}
-              {pathname.includes('/notifications') && <BellIcon className="w-4 h-4" />}
-              {pathname.includes('/event') && <HashtagIcon className="w-4 h-4" />}
-              {!pathname.includes('/calendar') && 
-                !pathname.includes('/dashboard') && 
-                !pathname.includes('/messages') && 
-                !pathname.includes('/groups') && 
-                !pathname.includes('/profile') && 
-                !pathname.includes('/settings') && 
-                !pathname.includes('/notifications') && 
-                !pathname.includes('/event') && 
-                <HashtagIcon className="w-4 h-4" />
-              }
-            </span>
-            {pathname.split('/').pop() || 'dashboard'}
-          </h2>
-          
-          {/* Right side actions */}
-          <div className="ml-auto flex items-center space-x-3">
-            <Link
-              href="/event/new"
-              className="px-3 h-8 bg-[#f7f6f3] dark:bg-[#5865f2] text-[#37352f] dark:text-white rounded-md hover:bg-[#eeeeee] dark:hover:bg-[#4752c4] transition-colors flex items-center text-sm"
-            >
-              <PlusIcon className="w-4 h-4 mr-1" />
-              New
-            </Link>
-            <Link
-              href="/notifications"
-              className="relative w-8 h-8 rounded-md hover:bg-[#eeeeee] dark:hover:bg-[#36393f] flex items-center justify-center text-[#6b7280] dark:text-gray-400 hover:text-[#37352f] dark:hover:text-gray-200"
-            >
-              <BellIcon className="w-5 h-5" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-[#eb5757] rounded-full"></span>
-            </Link>
-            <Link
-              href="/messages" 
-              className="w-8 h-8 rounded-md hover:bg-[#eeeeee] dark:hover:bg-[#36393f] flex items-center justify-center text-[#6b7280] dark:text-gray-400 hover:text-[#37352f] dark:hover:text-gray-200"
-            >
-              <MessageCircleIcon className="w-5 h-5" />
-            </Link>
-          </div>
-        </div>
-        
-        <main className="flex-1 overflow-y-auto bg-[#fbfbfa] dark:bg-[#36393f]">
-          <div className="p-4 max-w-5xl mx-auto">
+              {/* Messages Icon */}
+              <Link href="/messages" className="p-2 rounded-full text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f0f0f0] dark:hover:bg-[#40444b]">
+                <MessageCircleIcon className="w-5 h-5" />
+              </Link>
+
+              {/* User Profile Dropdown Placeholder */}
+              <div className="w-8 h-8 rounded-full bg-[#5865f2] flex items-center justify-center text-sm font-medium text-white cursor-pointer">
+                U
+              </div>
+            </div>
+          </header>
+
+          {/* Page Content */}
+          <main className="flex-1 overflow-y-auto">
             {children}
-          </div>
-        </main>
+          </main>
+        </div>
       </div>
-    </div>
-  )
+    </ThemeProvider>
+  );
 } 
