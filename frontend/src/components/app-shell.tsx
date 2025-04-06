@@ -84,7 +84,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className={`flex h-screen bg-[#fbfbfa] dark:bg-[#202225]`}>
+    <div className={`flex h-screen bg-white dark:bg-[#202225]`}>
       {/* Collapsible Sidebar */}
       <aside 
         className={`relative flex flex-col bg-white dark:bg-[#2f3136] transition-all duration-300 ease-in-out border-r border-[#e6e6e6] dark:border-[#202225] ${
@@ -111,7 +111,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   <li key={item.href}>
                     <Link 
                       href={item.href}
-                      title={item.label} // Tooltip when collapsed
+                      title={item.label}
                       className={`flex items-center rounded-md transition-colors duration-150 px-3 ${isSidebarOpen ? 'py-2' : 'py-3 justify-center'} ${
                         isActive
                           ? 'bg-[#f0f0f0] dark:bg-[#40444b] text-[#37352f] dark:text-white'
@@ -218,7 +218,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <input 
                 type="search" 
                 placeholder="Search..." 
-                className="pl-9 pr-3 py-1.5 w-48 bg-[#f0f0f0] dark:bg-[#202225] text-[#37352f] dark:text-white rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5865f2] border border-transparent dark:border-[#202225]"
+                className="pl-9 pr-3 py-1.5 w-48 bg-[#f0f0f0] dark:bg-[#202225] text-[#37352f] dark:text-white rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5865f2] border border-transparent dark:border-[#202225] placeholder-[#6b7280] dark:placeholder-[#b9bbbe]"
               />
             </div>
 
@@ -233,8 +233,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             {/* Notification Icon */}
             <Link href="/notifications" className="p-2 rounded-full text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f0f0f0] dark:hover:bg-[#40444b] relative">
               <BellIcon className="w-5 h-5" />
-              {/* Optional: Notification badge */}
-              {/* <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-[#ed4245] ring-2 ring-white dark:ring-[#2f3136]"></span> */}
             </Link>
 
             {/* Messages Icon */}
@@ -250,7 +248,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto bg-white dark:bg-[#202225]">
           {children}
         </main>
       </div>

@@ -102,134 +102,88 @@ export default function CalendarPage() {
   return (
     <AppShell>
       <div className="p-6">
-        {/* Calendar header - Notion style */}
-        <header className="mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <h1 className="text-3xl font-bold text-[#37352f] dark:text-white">
-              <span className="inline-flex items-center justify-center w-8 h-8 bg-[#eeeeee] dark:bg-[#2b2d31] text-[#5865f2] rounded-md mr-3">
-                <CalendarIcon className="w-5 h-5" />
+        {/* Calendar Header */}
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center gap-4">
+            <h2 className="text-2xl font-semibold text-[#37352f] dark:text-white">Calendar</h2>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1))}
+                className="p-2 rounded-md text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f0f0f0] dark:hover:bg-[#40444b]"
+              >
+                <ChevronLeftIcon className="w-5 h-5" />
+              </button>
+              <span className="text-lg font-medium text-[#37352f] dark:text-white">
+                {currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
               </span>
-              Calendar
-            </h1>
-            
-            <div className="flex space-x-2">
-              <Link 
-                href="/event/new"
-                className="px-3 h-8 bg-[#f7f6f3] dark:bg-[#5865f2] text-[#37352f] dark:text-white rounded-md hover:bg-[#eeeeee] dark:hover:bg-[#4752c4] transition-colors flex items-center text-sm"
+              <button
+                onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1))}
+                className="p-2 rounded-md text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f0f0f0] dark:hover:bg-[#40444b]"
               >
-                <PlusIcon className="w-4 h-4 mr-1" />
-                New Event
-              </Link>
-            </div>
-          </div>
-          
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center">
-              <h2 className="text-xl font-medium text-[#37352f] dark:text-white mr-2">
-                {monthName} {year}
-              </h2>
-              <div className="flex border border-[#e6e6e6] dark:border-[#202225] rounded-md overflow-hidden">
-                <button 
-                  onClick={previousMonth}
-                  className="p-1.5 bg-white dark:bg-[#2b2d31] text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f7f6f3] dark:hover:bg-[#36393f] transition-colors border-r border-[#e6e6e6] dark:border-[#202225]"
-                >
-                  <ChevronLeftIcon className="w-4 h-4" />
-                </button>
-                <button 
-                  onClick={nextMonth}
-                  className="p-1.5 bg-white dark:bg-[#2b2d31] text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f7f6f3] dark:hover:bg-[#36393f] transition-colors"
-                >
-                  <ChevronRightIcon className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-            
-            <div className="flex gap-2">
-              <div className="flex bg-white dark:bg-[#2b2d31] border border-[#e6e6e6] dark:border-[#202225] rounded-md overflow-hidden">
-                {['month', 'week', 'day'].map((viewType) => (
-                  <button 
-                    key={viewType}
-                    onClick={() => setView(viewType as 'month' | 'week' | 'day')}
-                    className={`px-3 py-1.5 text-sm transition-colors ${
-                      view === viewType
-                        ? 'bg-[#f7f6f3] dark:bg-[#36393f] text-[#37352f] dark:text-white'
-                        : 'text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f7f6f3] dark:hover:bg-[#36393f] hover:text-[#37352f] dark:hover:text-white'
-                    } ${viewType !== 'day' ? 'border-r border-[#e6e6e6] dark:border-[#202225]' : ''}`}
-                  >
-                    {viewType.charAt(0).toUpperCase() + viewType.slice(1)}
-                  </button>
-                ))}
-              </div>
-              
-              <button 
-                onClick={goToToday}
-                className="px-4 py-1.5 text-sm bg-[#f7f6f3] dark:bg-[#3ba55c] text-[#37352f] dark:text-white rounded-md hover:bg-[#eeeeee] dark:hover:bg-[#359951] transition-colors border border-[#e6e6e6] dark:border-transparent"
-              >
-                Today
+                <ChevronRightIcon className="w-5 h-5" />
               </button>
             </div>
           </div>
-        </header>
-        
-        {/* Calendar content - Notion inspired */}
-        <div className="bg-white dark:bg-[#2f3136] rounded-lg border border-[#e6e6e6] dark:border-[#202225] overflow-hidden shadow-sm">
-          {/* Day headers */}
-          <div className="grid grid-cols-7 bg-[#f7f6f3] dark:bg-[#2b2d31] border-b border-[#e6e6e6] dark:border-[#202225]">
-            {dayNames.map(day => (
-              <div 
-                key={day} 
-                className="py-2 text-center text-sm font-medium text-[#6b7280] dark:text-[#b9bbbe]"
+          <Link 
+            href="/event/new"
+            className="px-4 py-2 bg-[#5865f2] text-white rounded-md hover:bg-[#4752c4] transition-colors flex items-center"
+          >
+            <PlusIcon className="w-4 h-4 mr-1" />
+            Add Event
+          </Link>
+        </div>
+
+        {/* Calendar Grid */}
+        <div className="bg-white dark:bg-[#2f3136] rounded-lg border border-[#e6e6e6] dark:border-[#202225] overflow-hidden">
+          {/* Weekday Headers */}
+          <div className="grid grid-cols-7 border-b border-[#e6e6e6] dark:border-[#202225]">
+            {dayNames.map((day) => (
+              <div
+                key={day}
+                className="py-3 text-center text-sm font-medium text-[#6b7280] dark:text-[#b9bbbe]"
               >
                 {day}
               </div>
             ))}
           </div>
-          
-          {/* Calendar days - Notion inspired */}
-          <div className="grid grid-cols-7 divide-x divide-y divide-[#e6e6e6] dark:divide-[#202225]">
+
+          {/* Calendar Days */}
+          <div className="grid grid-cols-7">
             {monthData.map((day, index) => (
-              <div 
-                key={index} 
-                className={`min-h-[110px] relative p-2 ${
-                  day.day === 0
-                    ? 'bg-[#f7f6f3] dark:bg-[#202225]'
-                    : day.date?.toDateString() === new Date().toDateString()
-                      ? 'bg-[#f8f8f7] dark:bg-[#36393f]'
-                      : 'bg-white dark:bg-[#2f3136] hover:bg-[#f8f8f7] dark:hover:bg-[#36393f] transition-colors'
+              <div
+                key={index}
+                className={`min-h-[120px] p-2 border-r border-b border-[#e6e6e6] dark:border-[#202225] ${
+                  index % 7 === 6 ? 'border-r-0' : ''
                 }`}
               >
-                {day.day > 0 && (
-                  <>
-                    <div className="flex justify-between items-center mb-2">
-                      <span 
-                        className={`text-sm ${
-                          day.date?.toDateString() === new Date().toDateString()
-                            ? 'font-medium text-[#37352f] dark:text-white'
-                            : 'text-[#6b7280] dark:text-[#b9bbbe]'
-                        }`}
-                      >
-                        {day.day}
-                      </span>
-                      <Link 
-                        href={day.date ? `/event/new?date=${day.date.toISOString().split('T')[0]}` : '#'}
-                        className="w-5 h-5 rounded-md bg-transparent flex items-center justify-center text-transparent hover:text-[#6b7280] dark:hover:text-[#b9bbbe] hover:bg-[#f7f6f3] dark:hover:bg-[#2b2d31] transition-colors group"
-                      >
-                        <PlusIcon className="w-3 h-3" />
-                      </Link>
-                    </div>
-                    <div className="space-y-1 overflow-y-auto max-h-[80px]">
-                      {day.events.map(event => (
-                        <Link 
-                          key={event.id}
-                          href={`/event/${event.id}`}
-                          className={`${event.color} opacity-90 hover:opacity-100 px-2 py-1 rounded text-white text-xs truncate shadow-sm block transition-all`}
-                        >
-                          {event.title}
-                        </Link>
-                      ))}
-                    </div>
-                  </>
-                )}
+                <div className="flex justify-between items-center mb-2">
+                  <span className={`text-sm font-medium ${
+                    day.date?.toDateString() === new Date().toDateString()
+                      ? 'text-[#37352f] dark:text-white'
+                      : 'text-[#6b7280] dark:text-[#b9bbbe]'
+                  }`}>
+                    {day.day > 0 ? day.day : day.date?.getDate()}
+                  </span>
+                  <Link 
+                    href={day.date ? `/event/new?date=${day.date.toISOString().split('T')[0]}` : '#'}
+                    className="w-5 h-5 rounded-full bg-[#f0f0f0] dark:bg-[#36393f] border border-[#e6e6e6] dark:border-[#202225] flex items-center justify-center text-[#6b7280] dark:text-[#b9bbbe] hover:text-[#37352f] dark:hover:text-white hover:bg-[#e6e6e6] dark:hover:bg-[#40444b] hover:border-[#b9bbbe] transition-colors"
+                  >
+                    <PlusIcon className="w-3 h-3" />
+                  </Link>
+                </div>
+
+                {/* Events for the day */}
+                <div className="space-y-1">
+                  {day.events.map((event) => (
+                    <Link
+                      key={event.id}
+                      href={`/event/${event.id}`}
+                      className="block p-1.5 rounded text-xs font-medium bg-[#f0f0f0] dark:bg-[#36393f] text-[#37352f] dark:text-white hover:bg-[#e6e6e6] dark:hover:bg-[#40444b] transition-colors truncate"
+                    >
+                      {event.title}
+                    </Link>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
