@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, createContext, useContext } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { 
@@ -18,41 +18,7 @@ import {
   PlusIcon,
   SearchIcon
 } from './icons'
-
-// Theme context
-const ThemeContext = createContext({
-  theme: 'dark',
-  toggleTheme: () => {}
-});
-
-export const useTheme = () => useContext(ThemeContext);
-
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState('dark');
-
-  useEffect(() => {
-    const localTheme = window.localStorage.getItem('theme');
-    if (localTheme) {
-      setTheme(localTheme);
-      document.documentElement.classList.toggle('dark', localTheme === 'dark');
-    } else {
-      document.documentElement.classList.add('dark'); // Default to dark
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    window.localStorage.setItem('theme', newTheme);
-    document.documentElement.classList.toggle('dark', newTheme === 'dark');
-  };
-
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
-}
+import { useTheme } from '@/context/ThemeContext'
 
 // AppShell component
 interface NavItem {
@@ -118,178 +84,176 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <ThemeProvider>
-      <div className={`flex h-screen bg-[#fbfbfa] dark:bg-[#202225]`}>
-        {/* Collapsible Sidebar */}
-        <aside 
-          className={`relative flex flex-col bg-white dark:bg-[#2f3136] transition-all duration-300 ease-in-out border-r border-[#e6e6e6] dark:border-[#202225] ${
-            isSidebarOpen ? 'w-64' : 'w-20'
-          }`}
-        >
-          {/* Sidebar Header */}
-          <div className="h-16 flex items-center px-4 border-b border-[#e6e6e6] dark:border-[#202225] flex-shrink-0">
-            <Link href="/dashboard" className="flex items-center gap-2 overflow-hidden">
-              <span className="text-2xl">🗓️</span>
-              {isSidebarOpen && <span className="text-lg font-semibold text-[#37352f] dark:text-white whitespace-nowrap">SharedCal</span>}
-            </Link>
+    <div className={`flex h-screen bg-[#fbfbfa] dark:bg-[#202225]`}>
+      {/* Collapsible Sidebar */}
+      <aside 
+        className={`relative flex flex-col bg-white dark:bg-[#2f3136] transition-all duration-300 ease-in-out border-r border-[#e6e6e6] dark:border-[#202225] ${
+          isSidebarOpen ? 'w-64' : 'w-20'
+        }`}
+      >
+        {/* Sidebar Header */}
+        <div className="h-16 flex items-center px-4 border-b border-[#e6e6e6] dark:border-[#202225] flex-shrink-0">
+          <Link href="/dashboard" className="flex items-center gap-2 overflow-hidden">
+            <span className="text-2xl">🗓️</span>
+            {isSidebarOpen && <span className="text-lg font-semibold text-[#37352f] dark:text-white whitespace-nowrap">SharedCal</span>}
+          </Link>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto p-4 space-y-4">
+          {/* Main Navigation */}
+          <div>
+            {isSidebarOpen && <h3 className="text-xs font-semibold text-[#6b7280] dark:text-[#8e9297] uppercase mb-2 px-2">Menu</h3>}
+            <ul className="space-y-1">
+              {mainNavItems.map((item) => {
+                const isActive = item.match ? item.match(pathname) : pathname.startsWith(item.href);
+                return (
+                  <li key={item.href}>
+                    <Link 
+                      href={item.href}
+                      title={item.label} // Tooltip when collapsed
+                      className={`flex items-center rounded-md transition-colors duration-150 px-3 ${isSidebarOpen ? 'py-2' : 'py-3 justify-center'} ${
+                        isActive
+                          ? 'bg-[#f0f0f0] dark:bg-[#40444b] text-[#37352f] dark:text-white'
+                          : 'text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f7f6f3] dark:hover:bg-[#36393f] hover:text-[#37352f] dark:hover:text-white'
+                      }`}
+                    >
+                      <item.icon className={`w-5 h-5 ${isSidebarOpen ? 'mr-3' : 'mx-auto'} flex-shrink-0`} />
+                      {isSidebarOpen && <span className="text-sm font-medium whitespace-nowrap">{item.label}</span>}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto p-4 space-y-4">
-            {/* Main Navigation */}
-            <div>
-              {isSidebarOpen && <h3 className="text-xs font-semibold text-[#6b7280] dark:text-[#8e9297] uppercase mb-2 px-2">Menu</h3>}
-              <ul className="space-y-1">
-                {mainNavItems.map((item) => {
-                  const isActive = item.match ? item.match(pathname) : pathname.startsWith(item.href);
-                  return (
-                    <li key={item.href}>
-                      <Link 
-                        href={item.href}
-                        title={item.label} // Tooltip when collapsed
-                        className={`flex items-center rounded-md transition-colors duration-150 px-3 ${isSidebarOpen ? 'py-2' : 'py-3 justify-center'} ${
-                          isActive
-                            ? 'bg-[#f0f0f0] dark:bg-[#40444b] text-[#37352f] dark:text-white'
-                            : 'text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f7f6f3] dark:hover:bg-[#36393f] hover:text-[#37352f] dark:hover:text-white'
-                        }`}
-                      >
-                        <item.icon className={`w-5 h-5 ${isSidebarOpen ? 'mr-3' : 'mx-auto'} flex-shrink-0`} />
-                        {isSidebarOpen && <span className="text-sm font-medium whitespace-nowrap">{item.label}</span>}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-
-            {/* Account Navigation */}
-            <div>
-              {isSidebarOpen && <h3 className="text-xs font-semibold text-[#6b7280] dark:text-[#8e9297] uppercase mb-2 px-2">Account</h3>}
-              <ul className="space-y-1">
-                {accountNavItems.map((item) => {
-                  const isActive = pathname.startsWith(item.href);
-                  return (
-                    <li key={item.href}>
-                      <Link 
-                        href={item.href}
-                        title={item.label}
-                        className={`flex items-center rounded-md transition-colors duration-150 px-3 ${isSidebarOpen ? 'py-2' : 'py-3 justify-center'} ${
-                          isActive
-                            ? 'bg-[#f0f0f0] dark:bg-[#40444b] text-[#37352f] dark:text-white'
-                            : 'text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f7f6f3] dark:hover:bg-[#36393f] hover:text-[#37352f] dark:hover:text-white'
-                        }`}
-                      >
-                        <item.icon className={`w-5 h-5 ${isSidebarOpen ? 'mr-3' : 'mx-auto'} flex-shrink-0`} />
-                        {isSidebarOpen && <span className="text-sm font-medium whitespace-nowrap">{item.label}</span>}
-                      </Link>
-                    </li>
-                  );
-                })}
-                {/* Logout */}
-                <li>
-                  <button 
-                    title="Logout"
-                    className={`flex items-center w-full rounded-md transition-colors duration-150 px-3 text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f7f6f3] dark:hover:bg-[#36393f] hover:text-[#37352f] dark:hover:text-white ${isSidebarOpen ? 'py-2' : 'py-3 justify-center'}`}
-                  >
-                    <LogOutIcon className={`w-5 h-5 ${isSidebarOpen ? 'mr-3' : 'mx-auto'} flex-shrink-0`} />
-                    {isSidebarOpen && <span className="text-sm font-medium whitespace-nowrap">Logout</span>}
-                  </button>
-                </li>
-              </ul>
-            </div>
-          </nav>
-
-          {/* Sidebar Footer & Toggle */}
-          <div className="p-4 border-t border-[#e6e6e6] dark:border-[#202225] mt-auto">
-            {/* User profile preview - simplified */}
-            {isSidebarOpen && (
-              <div className="flex items-center mb-3">
-                <div className="w-8 h-8 rounded-full bg-[#5865f2] flex items-center justify-center text-sm font-medium text-white mr-2">
-                  U
-                </div>
-                <div className="text-sm overflow-hidden">
-                  <p className="font-medium text-[#37352f] dark:text-white truncate">Username</p>
-                  <p className="text-xs text-[#6b7280] dark:text-[#b9bbbe] truncate">user@example.com</p>
-                </div>
-              </div>
-            )}
-            <div className={`flex ${isSidebarOpen ? 'justify-between' : 'justify-center'} items-center`}>
-              {/* Theme Toggle */}
-              <button 
-                onClick={toggleTheme}
-                title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
-                className="p-2 rounded-md text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f0f0f0] dark:hover:bg-[#40444b]"
-              >
-                {theme === 'light' ? <MoonIcon className="w-5 h-5" /> : <SunIcon className="w-5 h-5" />}
-              </button>
-
-              {/* Sidebar Toggle */}
-              <button
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                title={isSidebarOpen ? 'Collapse Sidebar' : 'Expand Sidebar'}
-                className="p-2 rounded-md text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f0f0f0] dark:hover:bg-[#40444b]"
-              >
-                {isSidebarOpen ? <ChevronLeftIcon className="w-5 h-5" /> : <ChevronRightIcon className="w-5 h-5" />}
-              </button>
-            </div>
+          {/* Account Navigation */}
+          <div>
+            {isSidebarOpen && <h3 className="text-xs font-semibold text-[#6b7280] dark:text-[#8e9297] uppercase mb-2 px-2">Account</h3>}
+            <ul className="space-y-1">
+              {accountNavItems.map((item) => {
+                const isActive = pathname.startsWith(item.href);
+                return (
+                  <li key={item.href}>
+                    <Link 
+                      href={item.href}
+                      title={item.label}
+                      className={`flex items-center rounded-md transition-colors duration-150 px-3 ${isSidebarOpen ? 'py-2' : 'py-3 justify-center'} ${
+                        isActive
+                          ? 'bg-[#f0f0f0] dark:bg-[#40444b] text-[#37352f] dark:text-white'
+                          : 'text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f7f6f3] dark:hover:bg-[#36393f] hover:text-[#37352f] dark:hover:text-white'
+                      }`}
+                    >
+                      <item.icon className={`w-5 h-5 ${isSidebarOpen ? 'mr-3' : 'mx-auto'} flex-shrink-0`} />
+                      {isSidebarOpen && <span className="text-sm font-medium whitespace-nowrap">{item.label}</span>}
+                    </Link>
+                  </li>
+                );
+              })}
+              {/* Logout */}
+              <li>
+                <button 
+                  title="Logout"
+                  className={`flex items-center w-full rounded-md transition-colors duration-150 px-3 text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f7f6f3] dark:hover:bg-[#36393f] hover:text-[#37352f] dark:hover:text-white ${isSidebarOpen ? 'py-2' : 'py-3 justify-center'}`}
+                >
+                  <LogOutIcon className={`w-5 h-5 ${isSidebarOpen ? 'mr-3' : 'mx-auto'} flex-shrink-0`} />
+                  {isSidebarOpen && <span className="text-sm font-medium whitespace-nowrap">Logout</span>}
+                </button>
+              </li>
+            </ul>
           </div>
-        </aside>
+        </nav>
 
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Header */}
-          <header className="h-16 bg-white dark:bg-[#2f3136] border-b border-[#e6e6e6] dark:border-[#202225] flex items-center justify-between px-6 flex-shrink-0">
-            {/* Page Title & Icon */}
-            <div className="flex items-center gap-3">
-              {CurrentPageIcon && <CurrentPageIcon className="w-5 h-5 text-[#6b7280] dark:text-[#b9bbbe]" />}
-              <h1 className="text-lg font-medium text-[#37352f] dark:text-white whitespace-nowrap">{currentPageTitle}</h1>
-            </div>
-            
-            {/* Header Actions */}
-            <div className="flex items-center gap-3">
-              {/* Search - Simplified Placeholder */}
-              <div className="relative">
-                <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#6b7280] dark:text-[#b9bbbe]" />
-                <input 
-                  type="search" 
-                  placeholder="Search..." 
-                  className="pl-9 pr-3 py-1.5 w-48 bg-[#f0f0f0] dark:bg-[#202225] text-[#37352f] dark:text-white rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5865f2] border border-transparent dark:border-[#202225]"
-                />
-              </div>
-
-              <Link 
-                href="/event/new"
-                className="px-3 py-1.5 bg-[#5865f2] text-white rounded-md hover:bg-[#4752c4] transition-colors flex items-center text-sm"
-              >
-                <PlusIcon className="w-4 h-4 mr-1" />
-                New Event
-              </Link>
-
-              {/* Notification Icon */}
-              <Link href="/notifications" className="p-2 rounded-full text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f0f0f0] dark:hover:bg-[#40444b] relative">
-                <BellIcon className="w-5 h-5" />
-                {/* Optional: Notification badge */}
-                {/* <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-[#ed4245] ring-2 ring-white dark:ring-[#2f3136]"></span> */}
-              </Link>
-
-              {/* Messages Icon */}
-              <Link href="/messages" className="p-2 rounded-full text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f0f0f0] dark:hover:bg-[#40444b]">
-                <MessageCircleIcon className="w-5 h-5" />
-              </Link>
-
-              {/* User Profile Dropdown Placeholder */}
-              <div className="w-8 h-8 rounded-full bg-[#5865f2] flex items-center justify-center text-sm font-medium text-white cursor-pointer">
+        {/* Sidebar Footer & Toggle */}
+        <div className="p-4 border-t border-[#e6e6e6] dark:border-[#202225] mt-auto">
+          {/* User profile preview - simplified */}
+          {isSidebarOpen && (
+            <div className="flex items-center mb-3">
+              <div className="w-8 h-8 rounded-full bg-[#5865f2] flex items-center justify-center text-sm font-medium text-white mr-2">
                 U
               </div>
+              <div className="text-sm overflow-hidden">
+                <p className="font-medium text-[#37352f] dark:text-white truncate">Username</p>
+                <p className="text-xs text-[#6b7280] dark:text-[#b9bbbe] truncate">user@example.com</p>
+              </div>
             </div>
-          </header>
+          )}
+          <div className={`flex ${isSidebarOpen ? 'justify-between' : 'justify-center'} items-center`}>
+            {/* Theme Toggle */}
+            <button 
+              onClick={toggleTheme}
+              title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+              className="p-2 rounded-md text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f0f0f0] dark:hover:bg-[#40444b]"
+            >
+              {theme === 'light' ? <MoonIcon className="w-5 h-5" /> : <SunIcon className="w-5 h-5" />}
+            </button>
 
-          {/* Page Content */}
-          <main className="flex-1 overflow-y-auto">
-            {children}
-          </main>
+            {/* Sidebar Toggle */}
+            <button
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              title={isSidebarOpen ? 'Collapse Sidebar' : 'Expand Sidebar'}
+              className="p-2 rounded-md text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f0f0f0] dark:hover:bg-[#40444b]"
+            >
+              {isSidebarOpen ? <ChevronLeftIcon className="w-5 h-5" /> : <ChevronRightIcon className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Header */}
+        <header className="h-16 bg-white dark:bg-[#2f3136] border-b border-[#e6e6e6] dark:border-[#202225] flex items-center justify-between px-6 flex-shrink-0">
+          {/* Page Title & Icon */}
+          <div className="flex items-center gap-3">
+            {CurrentPageIcon && <CurrentPageIcon className="w-5 h-5 text-[#6b7280] dark:text-[#b9bbbe]" />}
+            <h1 className="text-lg font-medium text-[#37352f] dark:text-white whitespace-nowrap">{currentPageTitle}</h1>
+          </div>
+          
+          {/* Header Actions */}
+          <div className="flex items-center gap-3">
+            {/* Search - Simplified Placeholder */}
+            <div className="relative">
+              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#6b7280] dark:text-[#b9bbbe]" />
+              <input 
+                type="search" 
+                placeholder="Search..." 
+                className="pl-9 pr-3 py-1.5 w-48 bg-[#f0f0f0] dark:bg-[#202225] text-[#37352f] dark:text-white rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5865f2] border border-transparent dark:border-[#202225]"
+              />
+            </div>
+
+            <Link 
+              href="/event/new"
+              className="px-3 py-1.5 bg-[#5865f2] text-white rounded-md hover:bg-[#4752c4] transition-colors flex items-center text-sm"
+            >
+              <PlusIcon className="w-4 h-4 mr-1" />
+              New Event
+            </Link>
+
+            {/* Notification Icon */}
+            <Link href="/notifications" className="p-2 rounded-full text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f0f0f0] dark:hover:bg-[#40444b] relative">
+              <BellIcon className="w-5 h-5" />
+              {/* Optional: Notification badge */}
+              {/* <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-[#ed4245] ring-2 ring-white dark:ring-[#2f3136]"></span> */}
+            </Link>
+
+            {/* Messages Icon */}
+            <Link href="/messages" className="p-2 rounded-full text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f0f0f0] dark:hover:bg-[#40444b]">
+              <MessageCircleIcon className="w-5 h-5" />
+            </Link>
+
+            {/* User Profile Dropdown Placeholder */}
+            <div className="w-8 h-8 rounded-full bg-[#5865f2] flex items-center justify-center text-sm font-medium text-white cursor-pointer">
+              U
+            </div>
+          </div>
+        </header>
+
+        {/* Page Content */}
+        <main className="flex-1 overflow-y-auto">
+          {children}
+        </main>
       </div>
-    </ThemeProvider>
+    </div>
   );
 } 
