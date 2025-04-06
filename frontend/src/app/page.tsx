@@ -96,7 +96,7 @@ export default function Home() {
               <div className="w-12 h-12 rounded-full bg-[#5865f2] bg-opacity-20 flex items-center justify-center mb-5 group-hover:bg-opacity-30 transition-colors">
                 <CalendarIcon className="w-6 h-6 text-[#5865f2]" />
               </div>
-              <h3 className="text-xl font-bold mb-3 text-white">Shared Calendars</h3>
+              <h3 className="text-xl font-bold mb-3 text-white">CJ's CALENDARS</h3>
               <p className="text-[#b9bbbe]">
                 Create and share multiple calendars with friends, family, or colleagues with flexible permission settings.
               </p>

@@ -16,7 +16,7 @@ const nunito = Nunito({
 })
 
 export const metadata: Metadata = {
-  title: 'Shared Calendar',
+  title: "CJ's CALENDARS",
   description: 'A platform for sharing calendars and making plans together',
 }
 

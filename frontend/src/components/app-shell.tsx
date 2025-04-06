@@ -95,7 +95,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="h-16 flex items-center px-4 border-b border-[#e6e6e6] dark:border-[#202225] flex-shrink-0">
           <Link href="/dashboard" className="flex items-center gap-2 overflow-hidden">
             <span className="text-2xl">🗓️</span>
-            {isSidebarOpen && <span className="text-lg font-semibold text-[#37352f] dark:text-white whitespace-nowrap">SharedCal</span>}
+            {isSidebarOpen && <span className="text-lg font-semibold text-[#37352f] dark:text-white whitespace-nowrap">CJ's CALENDARS</span>}
           </Link>
         </div>
 
