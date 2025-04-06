@@ -32,11 +32,10 @@ const mainNavItems: NavItem[] = [
   { href: '/dashboard', icon: HomeIcon, label: 'Dashboard', match: (p) => p === '/dashboard' },
   { href: '/calendar', icon: CalendarIcon, label: 'Calendar', match: (p) => p.startsWith('/calendar') || p.startsWith('/event') }, // Match calendar and event pages
   { href: '/groups', icon: UsersIcon, label: 'Groups', match: (p) => p.startsWith('/groups') },
-  // Removed Messages and Notifications as they are in the header
+  { href: '/messages', icon: MessageCircleIcon, label: 'Messages', match: (p) => p.startsWith('/messages') }, // Added Messages here
 ];
 
 const accountNavItems: NavItem[] = [
-  { href: '/profile', icon: UsersIcon, label: 'My Profile' },
   { href: '/settings', icon: SettingsIcon, label: 'Settings' },
 ];
 
@@ -49,7 +48,7 @@ const pageMetadata: { [key: string]: { title: string; icon: React.ElementType } 
   '/groups': { title: 'Groups', icon: UsersIcon },
   '/groups/new': { title: 'New Group', icon: PlusIcon },
   // Dynamic route for group detail - handled separately
-  '/profile': { title: 'Profile', icon: UsersIcon },
+  '/profile': { title: 'Profile', icon: UsersIcon }, // Kept for header title, though not in sidebar nav
   '/settings': { title: 'Settings', icon: SettingsIcon },
   '/messages': { title: 'Messages', icon: MessageCircleIcon },
   '/notifications': { title: 'Notifications', icon: BellIcon },
@@ -150,16 +149,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   </li>
                 );
               })}
-              {/* Logout */}
-              <li>
-                <button 
-                  title="Logout"
-                  className={`flex items-center w-full rounded-md transition-colors duration-150 px-3 text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f7f6f3] dark:hover:bg-[#36393f] hover:text-[#37352f] dark:hover:text-white ${isSidebarOpen ? 'py-2' : 'py-3 justify-center'}`}
-                >
-                  <LogOutIcon className={`w-5 h-5 ${isSidebarOpen ? 'mr-3' : 'mx-auto'} flex-shrink-0`} />
-                  {isSidebarOpen && <span className="text-sm font-medium whitespace-nowrap">Logout</span>}
-                </button>
-              </li>
             </ul>
           </div>
         </nav>
@@ -233,11 +222,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             {/* Notification Icon */}
             <Link href="/notifications" className="p-2 rounded-full text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f0f0f0] dark:hover:bg-[#40444b] relative">
               <BellIcon className="w-5 h-5" />
-            </Link>
-
-            {/* Messages Icon */}
-            <Link href="/messages" className="p-2 rounded-full text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f0f0f0] dark:hover:bg-[#40444b]">
-              <MessageCircleIcon className="w-5 h-5" />
             </Link>
 
             {/* User Profile Dropdown Placeholder */}
