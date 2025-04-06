@@ -1,286 +1,280 @@
 "use client"
 
-import { useState } from 'react'
-import Link from 'next/link'
 import { AppShell } from '@/components/app-shell'
-import { CalendarIcon, UsersIcon, BellIcon, PlusIcon, HashtagIcon } from '@/components/icons'
+import Link from 'next/link'
+import { CalendarIcon, MessageCircleIcon, BellIcon, UserIcon, SettingsIcon, UsersIcon, ChevronRightIcon } from '@/components/icons'
 
-// Mock data
+// Mock data for events
 const upcomingEvents = [
   {
     id: '1',
     title: 'Team Meeting',
-    date: '2023-06-10T10:00:00',
-    location: 'Conference Room A',
-    color: 'bg-[#5865f2]'
+    date: 'Today, 2:00 PM',
+    description: 'Weekly team sync to discuss project progress',
+    color: 'bg-[#5865f2]',
   },
   {
     id: '2',
     title: 'Lunch with Alex',
-    date: '2023-06-10T12:30:00',
-    location: 'Cafe Downtown',
-    color: 'bg-[#3ba55c]'
+    date: 'Tomorrow, 12:30 PM',
+    description: 'Catching up over lunch at the new restaurant downtown',
+    color: 'bg-[#3ba55c]',
   },
   {
     id: '3',
     title: 'Project Deadline',
-    date: '2023-06-12T17:00:00',
-    location: 'Office',
-    color: 'bg-[#eb459e]'
+    date: 'Jun 15, 11:59 PM',
+    description: 'Final submission for the Q2 project',
+    color: 'bg-[#eb459e]',
   },
 ]
 
-const myCalendars = [
+// Mock data for groups
+const groups = [
   {
     id: '1',
-    name: 'Personal',
-    events: 12,
-    color: 'bg-[#5865f2]'
+    name: 'Family',
+    events: 3,
+    color: 'bg-[#5865f2]',
   },
   {
     id: '2',
-    name: 'Work',
-    events: 8,
-    color: 'bg-[#3ba55c]'
-  },
-  {
-    id: '3',
-    name: 'Family',
+    name: 'Work Team',
     events: 5,
-    color: 'bg-[#eb459e]'
+    color: 'bg-[#3ba55c]',
   },
 ]
 
-const myGroups = [
-  {
-    id: '1',
-    name: 'Development Team',
-    members: 6,
-    avatar: '👨‍💻',
-    color: 'bg-[#5865f2]'
-  },
-  {
-    id: '2',
-    name: 'Family',
-    members: 4,
-    avatar: '👨‍👩‍👧‍👦',
-    color: 'bg-[#3ba55c]'
-  },
-  {
-    id: '3',
-    name: 'Hiking Club',
-    members: 12,
-    avatar: '🏔️',
-    color: 'bg-[#eb459e]'
-  },
-]
-
-export default function Dashboard() {
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleString('en-US', {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit'
-    })
-  }
-
+export default function DashboardPage() {
   return (
     <AppShell>
       <div className="p-6">
+        {/* Dashboard header - Notion style */}
         <header className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-2">
-            <span className="h-7 w-1 bg-[#5865f2] rounded-full"></span>
-            Welcome back, User!
-          </h1>
-          <p className="text-[#b9bbbe]">
-            Here's what's happening with your calendars
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="text-3xl font-bold text-[#37352f] dark:text-white">
+              <span className="inline-flex items-center justify-center w-8 h-8 bg-[#eeeeee] dark:bg-[#2b2d31] rounded-md mr-3">
+                🏠
+              </span>
+              Dashboard
+            </h1>
+          </div>
+          <p className="text-[#6b7280] dark:text-[#b9bbbe] max-w-2xl">
+            Welcome to your personal dashboard. View your upcoming events, latest group activities, and quick access to important features.
           </p>
         </header>
 
+        {/* Dashboard content - Grid layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main content - Upcoming Events */}
+          {/* Left column */}
           <div className="lg:col-span-2 space-y-6">
-            <section className="bg-[#2f3136] rounded-lg border border-[#202225] overflow-hidden">
-              <div className="flex items-center border-b border-[#202225] px-4 py-3">
-                <h2 className="text-lg font-semibold text-white flex items-center">
-                  <CalendarIcon className="w-5 h-5 mr-2 text-[#b9bbbe]" />
+            {/* Upcoming Events section */}
+            <section className="bg-white dark:bg-[#2f3136] rounded-lg border border-[#e6e6e6] dark:border-[#202225] shadow-sm overflow-hidden">
+              <div className="p-4 border-b border-[#e6e6e6] dark:border-[#202225] flex justify-between items-center">
+                <h2 className="text-lg font-medium text-[#37352f] dark:text-white flex items-center">
+                  <span className="inline-flex items-center justify-center w-6 h-6 bg-[#eeeeee] dark:bg-[#36393f] text-[#5865f2] rounded-md mr-2">
+                    <CalendarIcon className="w-4 h-4" />
+                  </span>
                   Upcoming Events
                 </h2>
-                <Link 
-                  href="/calendar" 
-                  className="ml-auto text-sm text-[#5865f2] hover:underline"
-                >
-                  View Calendar
+                <Link href="/calendar" className="text-sm text-[#5865f2] hover:underline flex items-center">
+                  View calendar
+                  <ChevronRightIcon className="w-4 h-4 ml-1" />
                 </Link>
               </div>
-
-              <div className="p-4 space-y-3">
+              <div className="divide-y divide-[#e6e6e6] dark:divide-[#202225]">
                 {upcomingEvents.map(event => (
-                  <Link
-                    key={event.id}
+                  <Link 
+                    key={event.id} 
                     href={`/event/${event.id}`}
-                    className="flex items-start space-x-4 p-4 bg-[#36393f] rounded-md hover:bg-[#40444b] transition-colors duration-200 border border-[#202225]"
+                    className="block p-4 hover:bg-[#f7f6f3] dark:hover:bg-[#36393f] transition-colors"
                   >
-                    <div className={`${event.color} w-2 h-full rounded-full flex-shrink-0`}></div>
-                    <div className="flex-grow min-w-0">
-                      <h3 className="font-medium text-white truncate">
-                        {event.title}
-                      </h3>
-                      <p className="text-sm text-[#b9bbbe]">
-                        {formatDate(event.date)}
-                      </p>
-                      <p className="text-sm text-[#b9bbbe] truncate">
-                        {event.location}
-                      </p>
-                    </div>
-                    <div className="w-8 h-8 rounded-md hover:bg-[#4f545c] flex items-center justify-center text-[#b9bbbe] hover:text-white transition-colors">
-                      <BellIcon className="w-5 h-5" />
-                    </div>
-                  </Link>
-                ))}
-                
-                <div className="text-center pt-3">
-                  <Link
-                    href="/event/new"
-                    className="inline-flex items-center px-4 py-2 rounded-md bg-[#5865f2] text-white hover:bg-[#4752c4] transition-colors"
-                  >
-                    <PlusIcon className="w-5 h-5 mr-2" />
-                    Add New Event
-                  </Link>
-                </div>
-              </div>
-            </section>
-
-            <section className="bg-[#2f3136] rounded-lg border border-[#202225] overflow-hidden">
-              <div className="flex items-center border-b border-[#202225] px-4 py-3">
-                <h2 className="text-lg font-semibold text-white flex items-center">
-                  <UsersIcon className="w-5 h-5 mr-2 text-[#b9bbbe]" />
-                  My Groups
-                </h2>
-                <Link 
-                  href="/groups" 
-                  className="ml-auto text-sm text-[#5865f2] hover:underline"
-                >
-                  Manage Groups
-                </Link>
-              </div>
-
-              <div className="p-4 grid grid-cols-1 md:grid-cols-3 gap-3">
-                {myGroups.map(group => (
-                  <Link
-                    key={group.id}
-                    href={`/groups/${group.id}`}
-                    className="bg-[#36393f] border border-[#202225] rounded-md p-4 hover:bg-[#40444b] transition-all duration-200"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className={`w-10 h-10 rounded-full ${group.color} flex items-center justify-center text-lg shadow-sm`}>
-                        {group.avatar}
-                      </div>
-                      <div>
-                        <h3 className="font-medium text-white">
-                          {group.name}
-                        </h3>
-                        <p className="text-sm text-[#b9bbbe]">
-                          {group.members} members
+                    <div className="flex items-start">
+                      <div className={`${event.color} w-1 self-stretch rounded-full mr-3 flex-shrink-0`}></div>
+                      <div className="flex-1">
+                        <div className="flex justify-between items-start">
+                          <h3 className="font-medium text-[#37352f] dark:text-white">{event.title}</h3>
+                          <span className="text-sm text-[#6b7280] dark:text-[#b9bbbe]">{event.date}</span>
+                        </div>
+                        <p className="text-sm text-[#6b7280] dark:text-[#b9bbbe] mt-1 line-clamp-2">
+                          {event.description}
                         </p>
                       </div>
                     </div>
                   </Link>
                 ))}
+                {upcomingEvents.length === 0 && (
+                  <div className="p-8 text-center">
+                    <p className="text-[#6b7280] dark:text-[#b9bbbe]">No upcoming events</p>
+                    <Link 
+                      href="/event/new" 
+                      className="inline-flex items-center mt-2 text-[#5865f2] hover:underline"
+                    >
+                      Create an event
+                      <ChevronRightIcon className="w-4 h-4 ml-1" />
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </section>
+
+            {/* Groups section */}
+            <section className="bg-white dark:bg-[#2f3136] rounded-lg border border-[#e6e6e6] dark:border-[#202225] shadow-sm overflow-hidden">
+              <div className="p-4 border-b border-[#e6e6e6] dark:border-[#202225] flex justify-between items-center">
+                <h2 className="text-lg font-medium text-[#37352f] dark:text-white flex items-center">
+                  <span className="inline-flex items-center justify-center w-6 h-6 bg-[#eeeeee] dark:bg-[#36393f] text-[#5865f2] rounded-md mr-2">
+                    <UsersIcon className="w-4 h-4" />
+                  </span>
+                  My Groups
+                </h2>
+                <Link href="/groups" className="text-sm text-[#5865f2] hover:underline flex items-center">
+                  View all
+                  <ChevronRightIcon className="w-4 h-4 ml-1" />
+                </Link>
+              </div>
+              <div className="divide-y divide-[#e6e6e6] dark:divide-[#202225]">
+                {groups.map(group => (
+                  <Link 
+                    key={group.id} 
+                    href={`/groups/${group.id}`}
+                    className="flex items-center justify-between p-4 hover:bg-[#f7f6f3] dark:hover:bg-[#36393f] transition-colors"
+                  >
+                    <div className="flex items-center">
+                      <div className={`${group.color} w-8 h-8 rounded-md flex items-center justify-center text-white text-sm font-medium mr-3`}>
+                        {group.name.slice(0, 1)}
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-[#37352f] dark:text-white">{group.name}</h3>
+                        <p className="text-xs text-[#6b7280] dark:text-[#b9bbbe]">{group.events} upcoming events</p>
+                      </div>
+                    </div>
+                    <ChevronRightIcon className="w-5 h-5 text-[#6b7280] dark:text-[#b9bbbe]" />
+                  </Link>
+                ))}
+                {groups.length === 0 && (
+                  <div className="p-8 text-center">
+                    <p className="text-[#6b7280] dark:text-[#b9bbbe]">No groups yet</p>
+                    <Link 
+                      href="/groups/new" 
+                      className="inline-flex items-center mt-2 text-[#5865f2] hover:underline"
+                    >
+                      Create a group
+                      <ChevronRightIcon className="w-4 h-4 ml-1" />
+                    </Link>
+                  </div>
+                )}
               </div>
             </section>
           </div>
 
-          {/* Sidebar - My Calendars & Quick Links */}
+          {/* Right column */}
           <div className="space-y-6">
-            <section className="bg-[#2f3136] rounded-lg border border-[#202225] overflow-hidden">
-              <div className="border-b border-[#202225] px-4 py-3">
-                <h2 className="text-lg font-semibold text-white">
-                  My Calendars
-                </h2>
+            {/* Quick actions */}
+            <section className="bg-white dark:bg-[#2f3136] rounded-lg border border-[#e6e6e6] dark:border-[#202225] shadow-sm overflow-hidden">
+              <div className="p-4 border-b border-[#e6e6e6] dark:border-[#202225]">
+                <h2 className="text-lg font-medium text-[#37352f] dark:text-white">Quick Actions</h2>
               </div>
+              <div className="p-4 grid grid-cols-2 gap-3">
+                <Link 
+                  href="/event/new" 
+                  className="flex flex-col items-center justify-center p-4 bg-[#f7f6f3] dark:bg-[#36393f] rounded-lg hover:bg-[#eeeeee] dark:hover:bg-[#40444b] transition-colors text-center"
+                >
+                  <span className="inline-flex items-center justify-center w-8 h-8 bg-[#5865f2] rounded-md text-white mb-2">
+                    <CalendarIcon className="w-5 h-5" />
+                  </span>
+                  <span className="text-sm font-medium text-[#37352f] dark:text-white">New Event</span>
+                </Link>
+                <Link 
+                  href="/groups/new" 
+                  className="flex flex-col items-center justify-center p-4 bg-[#f7f6f3] dark:bg-[#36393f] rounded-lg hover:bg-[#eeeeee] dark:hover:bg-[#40444b] transition-colors text-center"
+                >
+                  <span className="inline-flex items-center justify-center w-8 h-8 bg-[#3ba55c] rounded-md text-white mb-2">
+                    <UsersIcon className="w-5 h-5" />
+                  </span>
+                  <span className="text-sm font-medium text-[#37352f] dark:text-white">New Group</span>
+                </Link>
+                <Link 
+                  href="/messages" 
+                  className="flex flex-col items-center justify-center p-4 bg-[#f7f6f3] dark:bg-[#36393f] rounded-lg hover:bg-[#eeeeee] dark:hover:bg-[#40444b] transition-colors text-center"
+                >
+                  <span className="inline-flex items-center justify-center w-8 h-8 bg-[#eb459e] rounded-md text-white mb-2">
+                    <MessageCircleIcon className="w-5 h-5" />
+                  </span>
+                  <span className="text-sm font-medium text-[#37352f] dark:text-white">Messages</span>
+                </Link>
+                <Link 
+                  href="/profile" 
+                  className="flex flex-col items-center justify-center p-4 bg-[#f7f6f3] dark:bg-[#36393f] rounded-lg hover:bg-[#eeeeee] dark:hover:bg-[#40444b] transition-colors text-center"
+                >
+                  <span className="inline-flex items-center justify-center w-8 h-8 bg-[#faa61a] rounded-md text-white mb-2">
+                    <UserIcon className="w-5 h-5" />
+                  </span>
+                  <span className="text-sm font-medium text-[#37352f] dark:text-white">Profile</span>
+                </Link>
+              </div>
+            </section>
 
-              <div className="p-4 space-y-2">
-                {myCalendars.map(calendar => (
-                  <Link
-                    key={calendar.id}
-                    href={`/calendar/${calendar.id}`}
-                    className="flex items-center justify-between p-3 bg-[#36393f] rounded-md hover:bg-[#40444b] transition-colors duration-200 border border-[#202225]"
-                  >
-                    <div className="flex items-center">
-                      <div className={`${calendar.color} w-3 h-3 rounded-full mr-3`}></div>
-                      <span className="font-medium text-white">
-                        {calendar.name}
-                      </span>
+            {/* Activity summary */}
+            <section className="bg-white dark:bg-[#2f3136] rounded-lg border border-[#e6e6e6] dark:border-[#202225] shadow-sm overflow-hidden">
+              <div className="p-4 border-b border-[#e6e6e6] dark:border-[#202225]">
+                <h2 className="text-lg font-medium text-[#37352f] dark:text-white">Activity Summary</h2>
+              </div>
+              <div className="p-4">
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-sm text-[#6b7280] dark:text-[#b9bbbe]">Events this month</span>
+                      <span className="text-sm font-medium text-[#37352f] dark:text-white">8</span>
                     </div>
-                    <span className="bg-[#202225] text-[#b9bbbe] text-xs px-2 py-1 rounded-full">
-                      {calendar.events} events
-                    </span>
-                  </Link>
-                ))}
-                <div className="pt-3">
-                  <Link
-                    href="/calendar/new"
-                    className="inline-flex items-center justify-center w-full px-4 py-2 rounded-md bg-[#3ba55c] text-white hover:bg-[#359951] transition-colors"
-                  >
-                    <PlusIcon className="w-5 h-5 mr-2" />
-                    Create Calendar
-                  </Link>
+                    <div className="w-full bg-[#eeeeee] dark:bg-[#202225] rounded-full h-2">
+                      <div className="bg-[#5865f2] h-2 rounded-full" style={{ width: '75%' }}></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-sm text-[#6b7280] dark:text-[#b9bbbe]">Active groups</span>
+                      <span className="text-sm font-medium text-[#37352f] dark:text-white">2/5</span>
+                    </div>
+                    <div className="w-full bg-[#eeeeee] dark:bg-[#202225] rounded-full h-2">
+                      <div className="bg-[#3ba55c] h-2 rounded-full" style={{ width: '40%' }}></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-sm text-[#6b7280] dark:text-[#b9bbbe]">Messages</span>
+                      <span className="text-sm font-medium text-[#37352f] dark:text-white">12 new</span>
+                    </div>
+                    <div className="w-full bg-[#eeeeee] dark:bg-[#202225] rounded-full h-2">
+                      <div className="bg-[#eb459e] h-2 rounded-full" style={{ width: '60%' }}></div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </section>
 
-            <section className="bg-[#2f3136] rounded-lg border border-[#202225] overflow-hidden">
-              <div className="border-b border-[#202225] px-4 py-3">
-                <h2 className="text-lg font-semibold text-white">
-                  Quick Actions
-                </h2>
+            {/* Shortcuts */}
+            <section className="bg-white dark:bg-[#2f3136] rounded-lg border border-[#e6e6e6] dark:border-[#202225] shadow-sm overflow-hidden">
+              <div className="p-4 border-b border-[#e6e6e6] dark:border-[#202225]">
+                <h2 className="text-lg font-medium text-[#37352f] dark:text-white">Shortcuts</h2>
               </div>
-              <div className="p-2">
-                <Link
-                  href="/event/new"
-                  className="flex items-center px-3 py-2 rounded-md text-[#b9bbbe] hover:bg-[#40444b] hover:text-white transition-colors"
+              <div className="divide-y divide-[#e6e6e6] dark:divide-[#202225]">
+                <Link 
+                  href="/notifications" 
+                  className="flex items-center p-3 hover:bg-[#f7f6f3] dark:hover:bg-[#36393f] transition-colors"
                 >
-                  <CalendarIcon className="w-5 h-5 mr-3 text-[#5865f2]" />
-                  <span>New Event</span>
+                  <span className="inline-flex items-center justify-center w-8 h-8 bg-[#f7f6f3] dark:bg-[#36393f] text-[#5865f2] rounded-md mr-3">
+                    <BellIcon className="w-4 h-4" />
+                  </span>
+                  <span className="text-sm text-[#37352f] dark:text-white">Notifications</span>
                 </Link>
-                <Link
-                  href="/groups/new"
-                  className="flex items-center px-3 py-2 rounded-md text-[#b9bbbe] hover:bg-[#40444b] hover:text-white transition-colors"
+                <Link 
+                  href="/settings" 
+                  className="flex items-center p-3 hover:bg-[#f7f6f3] dark:hover:bg-[#36393f] transition-colors"
                 >
-                  <UsersIcon className="w-5 h-5 mr-3 text-[#3ba55c]" />
-                  <span>New Group</span>
-                </Link>
-                <Link
-                  href="/profile"
-                  className="flex items-center px-3 py-2 rounded-md text-[#b9bbbe] hover:bg-[#40444b] hover:text-white transition-colors"
-                >
-                  <UsersIcon className="w-5 h-5 mr-3 text-[#eb459e]" />
-                  <span>My Profile</span>
-                </Link>
-                <Link
-                  href="/settings"
-                  className="flex items-center px-3 py-2 rounded-md text-[#b9bbbe] hover:bg-[#40444b] hover:text-white transition-colors"
-                >
-                  <HashtagIcon className="w-5 h-5 mr-3 text-[#faa61a]" />
-                  <span>Settings</span>
-                </Link>
-                <Link
-                  href="/notifications"
-                  className="flex items-center px-3 py-2 rounded-md text-[#b9bbbe] hover:bg-[#40444b] hover:text-white transition-colors"
-                >
-                  <BellIcon className="w-5 h-5 mr-3 text-[#ed4245]" />
-                  <span>Notifications</span>
-                </Link>
-                <Link
-                  href="/messages"
-                  className="flex items-center px-3 py-2 rounded-md text-[#b9bbbe] hover:bg-[#40444b] hover:text-white transition-colors"
-                >
-                  <CalendarIcon className="w-5 h-5 mr-3 text-[#9b59b6]" />
-                  <span>Messages</span>
+                  <span className="inline-flex items-center justify-center w-8 h-8 bg-[#f7f6f3] dark:bg-[#36393f] text-[#5865f2] rounded-md mr-3">
+                    <SettingsIcon className="w-4 h-4" />
+                  </span>
+                  <span className="text-sm text-[#37352f] dark:text-white">Settings</span>
                 </Link>
               </div>
             </section>
