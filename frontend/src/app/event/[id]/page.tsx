@@ -3,7 +3,17 @@
 import { useState } from 'react'
 import { AppShell } from '@/components/app-shell'
 import Link from 'next/link'
-import { CalendarIcon, MessageCircleIcon, BellIcon, UsersIcon, ChevronLeftIcon, SettingsIcon } from '@/components/icons'
+import { 
+  CalendarIcon, 
+  MessageCircleIcon, 
+  BellIcon, 
+  UsersIcon, 
+  ChevronLeftIcon, 
+  ClockIcon,
+  MapPinIcon,
+  TrashIcon,
+  PencilIcon
+} from '@/components/icons'
 
 // Mock event data
 const mockEvent = {
@@ -70,29 +80,17 @@ export default function EventPage({ params }: { params: { id: string } }) {
             <div className="flex flex-wrap gap-2">
               <Link 
                 href={`/event/${event.id}/edit`}
-                className="inline-flex items-center px-3 py-1.5 text-sm bg-white dark:bg-[#36393f] text-[#37352f] dark:text-white rounded-md hover:bg-[#eeeeee] dark:hover:bg-[#2f3136] transition-colors border border-[#e6e6e6] dark:border-[#202225]"
+                className="inline-flex items-center px-3 py-1.5 text-sm bg-white dark:bg-[#36393f] text-[#37352f] dark:text-white rounded-md hover:bg-[#eeeeee] dark:hover:bg-[#40444b] transition-colors border border-[#e6e6e6] dark:border-[#202225]"
               >
-                <SettingsIcon className="w-4 h-4 mr-1" />
+                <PencilIcon className="w-4 h-4 mr-1" />
                 Edit
               </Link>
               <button 
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className="inline-flex items-center px-3 py-1.5 text-sm bg-white dark:bg-[#36393f] text-[#ef4444] rounded-md hover:bg-[#eeeeee] dark:hover:bg-[#2f3136] transition-colors border border-[#e6e6e6] dark:border-[#202225] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center px-3 py-1.5 text-sm bg-white dark:bg-[#36393f] text-[#ef4444] rounded-md hover:bg-[#eeeeee] dark:hover:bg-[#40444b] transition-colors border border-[#e6e6e6] dark:border-[#202225] disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  className="w-4 h-4 mr-1" 
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  strokeWidth="2" 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round"
-                >
-                  <polyline points="3 6 5 6 21 6" />
-                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                </svg>
+                <TrashIcon className="w-4 h-4 mr-1" />
                 {isDeleting ? 'Deleting...' : 'Delete'}
               </button>
             </div>
@@ -123,19 +121,7 @@ export default function EventPage({ params }: { params: { id: string } }) {
                   
                   <div className="flex items-start">
                     <div className="flex-shrink-0 inline-flex items-center justify-center w-10 h-10 bg-[#f7f6f3] dark:bg-[#36393f] text-[#5865f2] rounded-md mr-4">
-                      <svg 
-                        xmlns="http://www.w3.org/2000/svg" 
-                        className="w-5 h-5" 
-                        viewBox="0 0 24 24" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        strokeWidth="2" 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round"
-                      >
-                        <circle cx="12" cy="12" r="10" />
-                        <polyline points="12 6 12 12 16 14" />
-                      </svg>
+                      <ClockIcon className="w-5 h-5" />
                     </div>
                     <div>
                       <h3 className="text-sm font-medium text-[#6b7280] dark:text-[#b9bbbe] mb-1">Time</h3>
@@ -145,19 +131,7 @@ export default function EventPage({ params }: { params: { id: string } }) {
                   
                   <div className="flex items-start">
                     <div className="flex-shrink-0 inline-flex items-center justify-center w-10 h-10 bg-[#f7f6f3] dark:bg-[#36393f] text-[#5865f2] rounded-md mr-4">
-                      <svg 
-                        xmlns="http://www.w3.org/2000/svg" 
-                        className="w-5 h-5" 
-                        viewBox="0 0 24 24" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        strokeWidth="2" 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round"
-                      >
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                        <circle cx="12" cy="10" r="3" />
-                      </svg>
+                      <MapPinIcon className="w-5 h-5" />
                     </div>
                     <div>
                       <h3 className="text-sm font-medium text-[#6b7280] dark:text-[#b9bbbe] mb-1">Location</h3>
