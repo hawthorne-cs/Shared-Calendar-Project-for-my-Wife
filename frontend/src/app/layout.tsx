@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Poppins, Nunito } from 'next/font/google'
 import './globals.css'
-import { ThemeProvider } from '@/components/theme-provider'
+import { ThemeProvider } from '@/context/ThemeContext'
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -28,12 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${poppins.variable} ${nunito.variable} font-sans`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
+        <ThemeProvider>
           {children}
         </ThemeProvider>
       </body>
