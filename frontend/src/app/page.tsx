@@ -45,7 +45,7 @@ export default function Home() {
                 Share calendars like <span className="text-[#5865f2]">never before</span>
         </h1>
               <p className="text-lg text-[#b9bbbe]">
-                A Discord-inspired platform where friends, couples, and groups can share schedules, 
+                A Discord and Notion-inspired platform where friends, couples, and groups can share schedules, 
                 collaborate on events, and stay connected without the hassle.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
