@@ -99,7 +99,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto p-4 space-y-4">
+        <nav 
+          id="sidebar-nav"
+          aria-label="Main menu"
+          className="flex-1 overflow-y-auto p-4 space-y-4"
+        >
           {/* Main Navigation */}
           <div>
             {isSidebarOpen && <h3 className="text-xs font-semibold text-[#6b7280] dark:text-[#8e9297] uppercase mb-2 px-2">Menu</h3>}
@@ -111,6 +115,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     <Link 
                       href={item.href}
                       title={item.label}
+                      aria-current={isActive ? 'page' : undefined}
                       className={`flex items-center rounded-md transition-colors duration-150 px-3 ${isSidebarOpen ? 'py-2' : 'py-3 justify-center'} ${
                         isActive
                           ? 'bg-[#f0f0f0] dark:bg-[#40444b] text-[#37352f] dark:text-white'
@@ -137,6 +142,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     <Link 
                       href={item.href}
                       title={item.label}
+                      aria-current={isActive ? 'page' : undefined}
                       className={`flex items-center rounded-md transition-colors duration-150 px-3 ${isSidebarOpen ? 'py-2' : 'py-3 justify-center'} ${
                         isActive
                           ? 'bg-[#f0f0f0] dark:bg-[#40444b] text-[#37352f] dark:text-white'
@@ -172,6 +178,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <button 
               onClick={toggleTheme}
               title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+              aria-pressed={theme === 'dark'}
               className="p-2 rounded-md text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f0f0f0] dark:hover:bg-[#40444b]"
             >
               {theme === 'light' ? <MoonIcon className="w-5 h-5" /> : <SunIcon className="w-5 h-5" />}
@@ -181,6 +188,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               title={isSidebarOpen ? 'Collapse Sidebar' : 'Expand Sidebar'}
+              aria-controls="sidebar-nav"
+              aria-expanded={isSidebarOpen}
               className="p-2 rounded-md text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f0f0f0] dark:hover:bg-[#40444b]"
             >
               {isSidebarOpen ? <ChevronLeftIcon className="w-5 h-5" /> : <ChevronRightIcon className="w-5 h-5" />}
@@ -201,12 +210,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           
           {/* Header Actions */}
           <div className="flex items-center gap-3">
-            {/* Search - Simplified Placeholder */}
+            {/* Search Input */}
             <div className="relative">
-              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#6b7280] dark:text-[#b9bbbe]" />
+              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#6b7280] dark:text-[#b9bbbe] pointer-events-none" />
               <input 
                 type="search" 
                 placeholder="Search..." 
+                aria-label="Search"
                 className="pl-9 pr-3 py-1.5 w-48 bg-[#f0f0f0] dark:bg-[#202225] text-[#37352f] dark:text-white rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5865f2] border border-transparent dark:border-[#202225] placeholder-[#6b7280] dark:placeholder-[#b9bbbe]"
               />
             </div>
@@ -219,15 +229,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               New Event
             </Link>
 
-            {/* Notification Icon */}
-            <Link href="/notifications" className="p-2 rounded-full text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f0f0f0] dark:hover:bg-[#40444b] relative">
+            {/* Notification Button */}
+            <Link 
+              href="/notifications" 
+              aria-label="View notifications"
+              className="p-2 rounded-full text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f0f0f0] dark:hover:bg-[#40444b] relative"
+            >
               <BellIcon className="w-5 h-5" />
             </Link>
 
-            {/* User Profile Dropdown Placeholder */}
-            <div className="w-8 h-8 rounded-full bg-[#5865f2] flex items-center justify-center text-sm font-medium text-white cursor-pointer">
+            {/* User Profile Button */}
+            <button 
+              aria-label="Open user menu"
+              className="w-8 h-8 rounded-full bg-[#5865f2] flex items-center justify-center text-sm font-medium text-white cursor-pointer hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5865f2] focus:ring-offset-white dark:focus:ring-offset-[#2f3136]"
+            >
               U
-            </div>
+            </button>
           </div>
         </header>
 

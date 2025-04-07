@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Poppins, Nunito } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/context/ThemeContext'
+import { Toaster } from 'react-hot-toast'
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -30,6 +31,30 @@ export default function RootLayout({
       <body className={`${poppins.variable} ${nunito.variable} font-sans`}>
         <ThemeProvider>
           {children}
+          <Toaster 
+            position="bottom-right"
+            toastOptions={{
+              duration: 3000,
+              style: {
+                background: '#333',
+                color: '#fff',
+                fontSize: '14px',
+              },
+              success: {
+                duration: 2000,
+                iconTheme: {
+                  primary: '#10B981',
+                  secondary: '#fff',
+                },
+              },
+              error: {
+                iconTheme: {
+                  primary: '#EF4444',
+                  secondary: '#fff',
+                },
+              }
+            }}
+          />
         </ThemeProvider>
       </body>
     </html>

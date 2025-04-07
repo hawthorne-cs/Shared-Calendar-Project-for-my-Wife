@@ -1,53 +1,102 @@
 "use client"
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AppShell } from '@/components/app-shell'
-import { CalendarIcon } from '@/components/icons'
+import { CalendarIcon, ClockIcon, MapPinIcon, UsersIcon, TextIcon } from '@/components/icons'
+import { Event, Calendar } from '@/types'
+import { createEvent, getCalendars } from '@/lib/api'
+import toast from 'react-hot-toast'
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
+import { Textarea } from '@/components/ui/Textarea'
+import { Label } from '@/components/ui/Label'
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/Select"
+import { Checkbox } from "@/components/ui/Checkbox"
 
-// Mock calendar data
-const myCalendars = [
-  { id: '1', name: 'Personal', color: 'bg-primary-500' },
-  { id: '2', name: 'Work', color: 'bg-secondary-500' },
-  { id: '3', name: 'Family', color: 'bg-accent-500' }
-]
+// Validation messages
+const REQUIRED_FIELD_MSG = "This field is required.";
+const MAX_LENGTH_MSG = (max: number) => `Must be ${max} characters or less.`;
+const DATE_IN_PAST_MSG = "Date cannot be in the past.";
 
-interface EventFormData {
-  title: string
-  description: string
-  date: string
-  startTime: string
-  endTime: string
-  location: string
-  calendarId: string
-  isAllDay: boolean
-  isRecurring: boolean
-  recurringType: 'daily' | 'weekly' | 'monthly' | 'yearly'
-  notificationTime: '5min' | '15min' | '30min' | '1hour' | '1day'
+// --- Explicit State Types ---
+interface NewEventFormData {
+  title: string;
+  description: string | null;
+  date: string;
+  startTime: string | null;
+  endTime: string | null;
+  isAllDay: boolean;
+  location: string | null;
+  calendarId: string;
+  // Omit recurrence/notification for now
 }
+
+interface NewEventFormErrors {
+  title?: string;
+  date?: string;
+  startTime?: string;
+  endTime?: string;
+  calendarId?: string;
+  description?: string;
+  location?: string;
+}
+
+// Initial empty state for the form
+const initialFormData: NewEventFormData = {
+  title: '',
+  description: '', // Start as empty string, API expects null maybe?
+  date: '',
+  startTime: null,
+  endTime: null,
+  isAllDay: false,
+  location: '',
+  calendarId: '',
+};
 
 export default function NewEventPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   
-  // Get date from URL parameters, or use today's date
   const dateFromParams = searchParams.get('date')
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [calendars, setCalendars] = useState<Calendar[]>([]);
+  const [isLoadingCalendars, setIsLoadingCalendars] = useState(true);
   
-  const [formData, setFormData] = useState<EventFormData>({
-    title: '',
-    description: '',
-    date: dateFromParams || new Date().toISOString().split('T')[0],
-    startTime: '09:00',
-    endTime: '10:00',
-    location: '',
-    calendarId: myCalendars[0].id,
-    isAllDay: false,
-    isRecurring: false,
-    recurringType: 'weekly',
-    notificationTime: '15min'
-  })
+  const [formData, setFormData] = useState<NewEventFormData>(initialFormData)
+  const [errors, setErrors] = useState<NewEventFormErrors>({})
   
-  // Update date when URL parameter changes
+  useEffect(() => {
+    let isMounted = true;
+    setIsLoadingCalendars(true);
+    getCalendars()
+      .then(data => {
+        if (isMounted) {
+          setCalendars(data);
+          if (data.length > 0 && !formData.calendarId) {
+            setFormData(prev => ({ ...prev, calendarId: data[0].id }));
+          }
+        }
+      })
+      .catch(err => {
+        console.error("Failed to fetch calendars:", err);
+        toast.error("Could not load calendars.");
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsLoadingCalendars(false);
+        }
+      });
+    return () => { isMounted = false; };
+  }, []); // formData removed from deps
+  
   useEffect(() => {
     if (dateFromParams) {
       setFormData(prev => ({
@@ -58,258 +107,309 @@ export default function NewEventPage() {
   }, [dateFromParams])
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
-  }
-  
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: checked
-    }))
-  }
-  
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log('Submitting event:', formData)
+    const { name, value, type } = e.target;
+    const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined;
+
+    setFormData(prev => {
+      const newStartTime = name === 'isAllDay' && checked ? null : (name === 'startTime' ? value : prev.startTime);
+      const newEndTime = name === 'isAllDay' && checked ? null : (name === 'endTime' ? value : prev.endTime);
+      
+      return {
+         ...prev,
+         [name]: type === 'checkbox' ? checked : value,
+         startTime: name === 'isAllDay' && checked ? null : newStartTime,
+         endTime: name === 'isAllDay' && checked ? null : newEndTime,
+       };
+    });
     
-    // Here you would typically make an API call to save the event
-    // For now, we'll just redirect back to the calendar
+    if (name in errors) {
+       setErrors(prev => {
+           const newErrors = { ...prev };
+           delete newErrors[name as keyof NewEventFormErrors];
+           return newErrors;
+       });
+    }
+  };
+  
+  const validateForm = (): boolean => {
+    const newErrors: NewEventFormErrors = {};
+    let isValid = true;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (!formData.title.trim()) {
+      newErrors.title = REQUIRED_FIELD_MSG;
+      isValid = false;
+    } else if (formData.title.length > 100) {
+      newErrors.title = MAX_LENGTH_MSG(100);
+      isValid = false;
+    }
+
+    if (!formData.date) {
+      newErrors.date = REQUIRED_FIELD_MSG;
+      isValid = false;
+    } else {
+      const selectedDate = new Date(formData.date + 'T00:00:00');
+      if (selectedDate < today) {
+        newErrors.date = DATE_IN_PAST_MSG;
+        isValid = false;
+      }
+    }
     
-    router.push('/calendar')
-  }
+    if (formData.description && formData.description.length > 200) {
+      newErrors.description = `Description must be 200 characters or less.`;
+      isValid = false;
+    }
+    
+    if (formData.location && formData.location.length > 200) {
+      newErrors.location = `Location must be 200 characters or less.`;
+      isValid = false;
+    }
+    
+    if (!formData.calendarId) {
+      newErrors.calendarId = "Please select a calendar.";
+      isValid = false;
+    }
+
+    if (!formData.isAllDay) {
+      if (!formData.startTime) {
+        newErrors.startTime = "Start time is required.";
+        isValid = false;
+      }
+      if (!formData.endTime) {
+        newErrors.endTime = "End time is required.";
+        isValid = false;
+      }
+      if (formData.startTime && formData.endTime && formData.startTime >= formData.endTime) {
+         newErrors.endTime = "End time must be after start time.";
+         isValid = false;
+      }
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateForm()) {
+      toast.error("Please fix the errors in the form.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    const eventPayload: Omit<Event, 'id'> = {
+        ...formData,
+        description: formData.description?.trim() || null, 
+        location: formData.location?.trim() || null,
+        startTime: formData.isAllDay ? null : formData.startTime,
+        endTime: formData.isAllDay ? null : formData.endTime,
+    };
+    
+    const promise = createEvent(eventPayload);
+
+    toast.promise(promise, {
+      loading: 'Creating event...',
+      success: () => {
+        setIsSubmitting(false);
+        router.push('/calendar');
+        return 'Event created successfully!';
+      },
+      error: (err) => {
+        setIsSubmitting(false);
+        return `Error creating event: ${err instanceof Error ? err.message : 'Unknown error'}`;
+      },
+    });
+  };
   
   const handleCancel = () => {
     router.back()
   }
   
+  const handleSelectChange = (value: string, name: keyof NewEventFormData) => {
+    setFormData(prev => ({
+       ...prev,
+       [name]: value,
+    }));
+    
+    if (name in errors) {
+       setErrors(prev => {
+           const newErrors = { ...prev };
+           delete newErrors[name as keyof NewEventFormErrors];
+           return newErrors;
+       });
+    }
+  };
+  
+  if (isLoadingCalendars) {
+     return <AppShell><div className="p-6 text-center">Loading form...</div></AppShell>;
+  }
+
   return (
     <AppShell>
       <div className="p-6">
         <header className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center">
-            <CalendarIcon className="w-6 h-6 mr-2 text-primary-500" />
+          <h1 className="text-2xl md:text-3xl font-bold text-[#37352f] dark:text-white flex items-center">
+            <CalendarIcon className="w-6 h-6 mr-2 text-[#5865f2]" />
             Create New Event
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Add a new event to your calendar
+          <p className="text-[#6b7280] dark:text-[#b9bbbe] mt-1">
+            Add a new event to your calendar.
           </p>
         </header>
         
-        <div className="card p-6 max-w-3xl mx-auto">
+        <div className="bg-white dark:bg-[#2f3136] rounded-lg border border-[#e6e6e6] dark:border-[#202225] p-6 sm:p-8 max-w-3xl mx-auto shadow-sm">
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Event Title */}
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Event Title *
-              </label>
-              <input
-                type="text"
+              <Label htmlFor="title">Event Title</Label>
+              <Input 
                 id="title"
                 name="title"
+                type="text"
+                placeholder="e.g., Team Meeting, Birthday Party"
                 value={formData.title}
                 onChange={handleInputChange}
-                className="input"
-                placeholder="Add title"
                 required
+                aria-invalid={!!errors.title}
+                aria-describedby={errors.title ? "title-error" : undefined}
+                className={errors.title ? 'border-red-500 dark:border-red-400 focus:ring-red-500' : ''}
               />
+              {errors.title && <p id="title-error" className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.title}</p>}
             </div>
             
-            {/* Description */}
-            <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Description
-              </label>
-              <textarea
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                className="input min-h-[100px]"
-                placeholder="Add description"
-              />
-            </div>
-            
-            {/* Date and Time */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Date *
-                </label>
-                <input
-                  type="date"
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="sm:col-span-1">
+                <Label htmlFor="date">Date</Label>
+                <Input 
                   id="date"
                   name="date"
+                  type="date"
                   value={formData.date}
                   onChange={handleInputChange}
-                  className="input"
                   required
+                  aria-invalid={!!errors.date}
+                  aria-describedby={errors.date ? "date-error" : undefined}
+                  className={errors.date ? 'border-red-500 dark:border-red-400 focus:ring-red-500' : ''}
                 />
+                {errors.date && <p id="date-error" className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.date}</p>}
               </div>
-              
-              <div className="flex items-center mt-6 md:mt-0">
-                <input
-                  type="checkbox"
-                  id="isAllDay"
-                  name="isAllDay"
-                  checked={formData.isAllDay}
-                  onChange={handleCheckboxChange}
-                  className="h-4 w-4 text-primary-600 rounded border-gray-300 focus:ring-primary-500"
+              <div className="sm:col-span-1">
+                <Label htmlFor="startTime">Start Time</Label>
+                <Input 
+                  id="startTime"
+                  name="startTime"
+                  type="time"
+                  value={formData.startTime ?? ''}
+                  onChange={handleInputChange}
+                  disabled={formData.isAllDay}
+                  required={!formData.isAllDay}
+                  aria-invalid={!!errors.startTime}
+                  aria-describedby={errors.startTime ? "startTime-error" : undefined}
+                  className={`${formData.isAllDay ? 'opacity-50 cursor-not-allowed' : ''} ${errors.startTime ? 'border-red-500 dark:border-red-400 focus:ring-red-500' : ''}`}
                 />
-                <label htmlFor="isAllDay" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
-                  All day event
-                </label>
+                {errors.startTime && <p id="startTime-error" className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.startTime}</p>}
+              </div>
+              <div className="sm:col-span-1">
+                <Label htmlFor="endTime">End Time</Label>
+                <Input 
+                  id="endTime"
+                  name="endTime"
+                  type="time"
+                  value={formData.endTime ?? ''}
+                  onChange={handleInputChange}
+                  disabled={formData.isAllDay}
+                  required={!formData.isAllDay}
+                  aria-invalid={!!errors.endTime}
+                  aria-describedby={errors.endTime ? "endTime-error" : undefined}
+                  className={`${formData.isAllDay ? 'opacity-50 cursor-not-allowed' : ''} ${errors.endTime ? 'border-red-500 dark:border-red-400 focus:ring-red-500' : ''}`}
+                />
+                {errors.endTime && <p id="endTime-error" className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.endTime}</p>}
               </div>
             </div>
             
-            {/* Time selection (only if not all day) */}
-            {!formData.isAllDay && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="startTime" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Start Time *
-                  </label>
-                  <input
-                    type="time"
-                    id="startTime"
-                    name="startTime"
-                    value={formData.startTime}
-                    onChange={handleInputChange}
-                    className="input"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label htmlFor="endTime" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    End Time *
-                  </label>
-                  <input
-                    type="time"
-                    id="endTime"
-                    name="endTime"
-                    value={formData.endTime}
-                    onChange={handleInputChange}
-                    className="input"
-                    required
-                  />
-                </div>
-              </div>
-            )}
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="isAllDay"
+                name="isAllDay"
+                checked={formData.isAllDay}
+                onCheckedChange={(checked) => {
+                  const simulatedEvent = {
+                    target: { name: 'isAllDay', value: checked, type: 'checkbox' }
+                  } as unknown as React.ChangeEvent<HTMLInputElement>;
+                  handleInputChange(simulatedEvent);
+                }}
+              />
+              <Label htmlFor="isAllDay" className="mb-0 cursor-pointer">All Day Event</Label>
+            </div>
             
-            {/* Location */}
             <div>
-              <label htmlFor="location" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Location
-              </label>
-              <input
-                type="text"
-                id="location"
-                name="location"
-                value={formData.location}
+              <Label htmlFor="description">Description (Optional)</Label>
+              <Textarea 
+                id="description"
+                name="description"
+                rows={4}
+                placeholder="Add details about the event..."
+                value={formData.description ?? ''}
                 onChange={handleInputChange}
-                className="input"
-                placeholder="Add location"
               />
             </div>
             
-            {/* Calendar Selection */}
             <div>
-              <label htmlFor="calendarId" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Calendar *
-              </label>
-              <select
-                id="calendarId"
-                name="calendarId"
+              <Label htmlFor="location">Location (Optional)</Label>
+              <Input 
+                id="location"
+                name="location"
+                type="text"
+                placeholder="e.g., Conference Room B, Zoom Link"
+                value={formData.location ?? ''}
+                onChange={handleInputChange}
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="calendarId">Calendar</Label>
+              <Select
                 value={formData.calendarId}
-                onChange={handleInputChange}
-                className="input"
-                required
+                onValueChange={(value) => handleSelectChange(value, 'calendarId')}
+                disabled={isLoadingCalendars || calendars.length === 0}
+                name="calendarId"
               >
-                {myCalendars.map(calendar => (
-                  <option key={calendar.id} value={calendar.id}>
-                    {calendar.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            
-            {/* Recurring Event */}
-            <div className="bg-gray-50 dark:bg-discord-800 p-4 rounded-lg">
-              <div className="flex items-center mb-4">
-                <input
-                  type="checkbox"
-                  id="isRecurring"
-                  name="isRecurring"
-                  checked={formData.isRecurring}
-                  onChange={handleCheckboxChange}
-                  className="h-4 w-4 text-primary-600 rounded border-gray-300 focus:ring-primary-500"
-                />
-                <label htmlFor="isRecurring" className="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Recurring Event
-                </label>
-              </div>
-              
-              {formData.isRecurring && (
-                <div className="mt-2">
-                  <label htmlFor="recurringType" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Repeat
-                  </label>
-                  <select
-                    id="recurringType"
-                    name="recurringType"
-                    value={formData.recurringType}
-                    onChange={handleInputChange}
-                    className="input"
+                 <SelectTrigger 
+                    id="calendarId" 
+                    className={`mt-1 ${errors.calendarId ? 'border-red-500 dark:border-red-400 focus:ring-red-500' : ''}`} 
+                    aria-invalid={!!errors.calendarId}
+                    aria-describedby={errors.calendarId ? "calendarId-error" : undefined}
                   >
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="monthly">Monthly</option>
-                    <option value="yearly">Yearly</option>
-                  </select>
-                </div>
-              )}
+                    <SelectValue placeholder={isLoadingCalendars ? "Loading calendars..." : (calendars.length === 0 ? "No calendars available" : "Select calendar")} />
+                 </SelectTrigger>
+                 <SelectContent>
+                    {!isLoadingCalendars && calendars.map(cal => (
+                       <SelectItem key={cal.id} value={cal.id}>{cal.name}</SelectItem>
+                    ))}
+                    {isLoadingCalendars && <SelectItem value="loading" disabled>Loading...</SelectItem>}
+                 </SelectContent>
+              </Select>
+              {errors.calendarId && <p id="calendarId-error" className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.calendarId}</p>}
             </div>
             
-            {/* Notification */}
-            <div>
-              <label htmlFor="notificationTime" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Notification
-              </label>
-              <select
-                id="notificationTime"
-                name="notificationTime"
-                value={formData.notificationTime}
-                onChange={handleInputChange}
-                className="input"
-              >
-                <option value="5min">5 minutes before</option>
-                <option value="15min">15 minutes before</option>
-                <option value="30min">30 minutes before</option>
-                <option value="1hour">1 hour before</option>
-                <option value="1day">1 day before</option>
-              </select>
-            </div>
-            
-            {/* Form Actions */}
-            <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-discord-700">
-              <button
-                type="button"
+            <div className="flex justify-end items-center gap-3 pt-4 border-t border-[#e6e6e6] dark:border-[#40444b]">
+              <button 
+                type="button" 
                 onClick={handleCancel}
-                className="btn-ghost"
+                className="px-4 py-2 rounded-md text-sm font-medium text-[#6b7280] dark:text-[#b9bbbe] hover:bg-[#f0f0f0] dark:hover:bg-[#40444b] transition-colors"
               >
                 Cancel
               </button>
-              <button
-                type="submit"
-                className="btn-primary"
-              >
-                Create Event
-              </button>
+              <Button type="submit" variant="primaryAction" disabled={isSubmitting || isLoadingCalendars}>
+                 {isSubmitting ? (
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  ) : null}
+                {isSubmitting ? 'Creating...' : 'Create Event'}
+              </Button>
             </div>
           </form>
         </div>
